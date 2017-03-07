@@ -1,0 +1,352 @@
+package com.muv.technicalplan;
+
+
+import com.muv.technicalplan.data.DataLinking;
+import com.muv.technicalplan.data.DataPosition;
+import com.muv.technicalplan.data.DataSearch;
+import com.muv.technicalplan.data.DataUser;
+import com.muv.technicalplan.data.DataUsers;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class JsonParser
+{
+    public boolean parseRecovery(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+
+    public DataUser parseUser(String dateUrl) throws Exception
+    {
+        DataUser dataUser = new DataUser();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                JSONObject object = jsonObj.getJSONObject(i);
+
+                int id = object.getInt("id");
+                String name = object.getString("name");
+                String surname = object.getString("surname");
+                String surname_father = object.getString("surname_father");
+                String enterprise = object.getString("enterprise");
+                String position = object.getString("position");
+                String login = object.getString("login");
+                String password = object.getString("password");
+                String email = object.getString("email");
+                int type_account = object.getInt("type_account");
+                String image = object.getString("images");
+                String name_table = object.getString("name_table");
+
+                dataUser.setUser_id(id);
+                dataUser.setName(name);
+                dataUser.setSurname(surname);
+                dataUser.setSurname_father(surname_father);
+                dataUser.setEnterprise(enterprise);
+                dataUser.setPosition(position);
+                dataUser.setLogin(login);
+                dataUser.setPassword(password);
+                dataUser.setEmail(email);
+                dataUser.setType_account(type_account);
+                dataUser.setImage(image);
+                dataUser.setName_table(name_table);
+            }
+        }
+        return dataUser;
+    }
+
+    public DataUsers parseUsers(String dateUrl) throws Exception
+    {
+        DataUsers dataUsers = new DataUsers();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                JSONObject object = jsonObj.getJSONObject(i);
+
+                String name = object.getString("name");
+                String surname = object.getString("surname");
+                String surname_father = object.getString("surname_father");
+                String enterprise = object.getString("enterprise");
+                String position = object.getString("position");
+                String login = object.getString("login");
+                String email = object.getString("email");
+                String image = object.getString("images");
+
+                dataUsers.setName(name);
+                dataUsers.setSurname(surname);
+                dataUsers.setSurname_father(surname_father);
+                dataUsers.setEnterprise(enterprise);
+                dataUsers.setPosition(position);
+                dataUsers.setLogin(login);
+                dataUsers.setEmail(email);
+                dataUsers.setImage(image);
+            }
+        }
+        return dataUsers;
+    }
+
+    public String parseCode(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        return buffer.toString();
+    }
+
+    public String parseRegistration(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        return buffer.toString();
+    }
+
+    public boolean parseRemoveRefresh(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+
+    public List<DataSearch> parseSearch(String dateUrl) throws Exception
+    {
+
+        List<DataSearch> list = new ArrayList<>();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                DataSearch data = new DataSearch();
+                JSONObject object = jsonObj.getJSONObject(i);
+                String login = object.getString("login");
+                String name = object.getString("name");
+                String surname = object.getString("surname");
+                String surname_father = object.getString("surname_father");
+                String enterprise = object.getString("enterprise");
+                String image = object.getString("images");
+
+                data.setImage(image);
+                data.setLogin(login);
+                data.setName(name);
+                data.setSurname(surname);
+                data.setSurname_father(surname_father);
+                data.setEnterprise(enterprise);
+                list.add(data);
+            }
+        }
+        return list;
+    }
+
+    public List<DataPosition> parseGetPosition(String dateUrl) throws Exception
+    {
+
+        List<DataPosition> list = new ArrayList<>();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                DataPosition data = new DataPosition();
+                JSONObject object = jsonObj.getJSONObject(i);
+                String login = object.getString("login");
+                String position = object.getString("position");
+                String code = object.getString("code");
+
+                data.setLogin(login);
+                data.setPosition(position);
+                data.setCode(code);
+                list.add(data);
+            }
+        }
+        return list;
+    }
+
+    public boolean parseSetLinking(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+
+    public List<DataLinking> parseGetLinking(String dateUrl) throws Exception
+    {
+
+        List<DataLinking> list = new ArrayList<>();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                DataLinking data = new DataLinking();
+                JSONObject object = jsonObj.getJSONObject(i);
+                String where_user = object.getString("where_user");
+                String from_user = object.getString("from_user");
+                String enterprise = object.getString("enterprise");
+                String position = object.getString("position");
+                String code = object.getString("code");
+                String state = object.getString("state");
+
+                data.setWhere_user(where_user);
+                data.setFrom_user(from_user);
+                data.setEnterprise(enterprise);
+                data.setPosition(position);
+                data.setCode(code);
+                data.setState(state);
+                list.add(data);
+            }
+        }
+        return list;
+    }
+
+    public boolean getUpdateEnterprise(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+}

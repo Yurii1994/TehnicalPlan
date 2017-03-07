@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainBackground">
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:id="@+id/toolbar_recovery"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="15dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="15dp"
+            android:textColor="@color/Grey"
+            android:text="@string/text_recovery"
+            android:textSize="8pt" />
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:textColor="@color/Grey"
+            android:background="@drawable/edit_text_recovery"
+            android:layout_marginBottom="6dp"
+            android:textColorHint="@color/GreyHint"
+            android:inputType="textNoSuggestions|text|textVisiblePassword"
+            android:gravity="center"
+            android:textCursorDrawable="@drawable/color_cursor_all"
+            android:textColorHighlight="@color/colorPrimary"
+            android:textSelectHandle="@mipmap/apptheme_text_select_handle_middle"
+            android:textSelectHandleLeft="@mipmap/apptheme_text_select_handle_left"
+            android:textSelectHandleRight="@mipmap/apptheme_text_select_handle_right"
+            android:hint="@string/email"
+            android:textSize="8pt"
+            android:typeface="normal" />
+
+        <Button
+            android:id="@+id/send"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:textColor="@color/colorWhite"
+            android:background="@drawable/button_all"
+            android:text="@string/send"
+            android:textAllCaps="false"
+            android:textSize="8pt"
+            android:typeface="normal"/>
+
+    </LinearLayout>
+
+</LinearLayout>

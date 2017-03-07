@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_weight="3">
+
+    <LinearLayout
+        android:id="@+id/download_scv"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/button_all"
+        android:clickable="true"
+        android:layout_marginRight="6dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/ic_file_download_white_48dp"
+            android:padding="6dp"/>
+
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/add_position_map_name"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/Grey"
+        android:background="@drawable/edit_text_registration"
+        android:layout_marginBottom="6dp"
+        android:textColorHint="@color/GreyHint"
+        android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+        android:gravity="center"
+        android:textCursorDrawable="@drawable/color_cursor_all"
+        android:textColorHighlight="@color/colorPrimary"
+        android:hint="@string/add_position_hint"
+        android:textSize="8pt"
+        android:typeface="normal"
+        android:layout_weight="2"
+        android:layout_marginRight="6dp"
+        android:padding="5dp"/>
+
+    <LinearLayout
+        android:id="@+id/upload"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/button_all"
+        android:clickable="true"
+        android:layout_marginRight="6dp">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/ic_attach_file_white_48dp"
+            android:padding="6dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/delete"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/button_all"
+        android:clickable="true">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:src="@mipmap/ic_delete_white_48dp"
+            android:padding="6dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>

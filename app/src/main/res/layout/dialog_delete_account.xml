@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:layout_margin="15dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_account"
+        android:textColor="@color/Grey"
+        android:gravity="center"
+        android:textSize="8pt"
+        android:layout_marginBottom="15dp"/>
+
+    <EditText
+        android:id="@+id/delete_code"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/Grey"
+        android:background="@drawable/edit_text_registration"
+        android:textColorHint="@color/GreyHint"
+        android:inputType="textNoSuggestions|text|textVisiblePassword"
+        android:gravity="center"
+        android:textCursorDrawable="@drawable/color_cursor_all"
+        android:textColorHighlight="@color/colorPrimary"
+        android:textSelectHandle="@mipmap/apptheme_text_select_handle_middle"
+        android:textSelectHandleLeft="@mipmap/apptheme_text_select_handle_left"
+        android:textSelectHandleRight="@mipmap/apptheme_text_select_handle_right"
+        android:hint="@string/code"
+        android:textSize="8pt"
+        android:typeface="normal"
+        android:layout_marginBottom="6dp"
+        android:maxLength="6"/>
+
+    <Button
+        android:id="@+id/delete_send_code"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:textColor="@color/colorWhite"
+        android:background="@drawable/button_all"
+        android:text="@string/send_code"
+        android:textAllCaps="false"
+        android:textSize="8pt"
+        android:typeface="normal" />
+
+</LinearLayout>
+</LinearLayout>

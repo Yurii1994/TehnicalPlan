@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/settings"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mainBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/colorWhite">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/enterprise_name"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textColor="@color/Grey"
+                android:background="@drawable/edit_text_registration"
+                android:layout_marginBottom="6dp"
+                android:textColorHint="@color/GreyHint"
+                android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                android:gravity="center"
+                android:textCursorDrawable="@drawable/color_cursor_all"
+                android:textColorHighlight="@color/colorPrimary"
+                android:hint="@string/hint_enterprise"
+                android:textSize="8pt"
+                android:typeface="normal"
+                android:padding="5dp"/>
+
+            <TextView
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/Grey"
+                android:gravity="center"
+                android:textSize="8pt"
+                android:typeface="normal"
+                android:text="@string/text_position_hint"/>
+
+            <RelativeLayout
+                android:layout_marginTop="15dp"
+                android:id="@+id/progress_position_enterprise"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:orientation="vertical">
+
+                <ProgressBar
+                    android:theme="@style/LinearProgressBlue"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="20dp"
+                    android:indeterminate="true"
+                    android:layout_centerInParent="true"/>
+
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/position_hint_enterprise"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textSize="8pt"
+                android:textColor="@color/GreyHint"
+                android:text="@string/not_position_enterprise"
+                android:gravity="center"
+                android:visibility="gone"/>
+
+            <LinearLayout
+                android:layout_marginTop="15dp"
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/add_position"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textColor="@color/colorWhite"
+                android:background="@drawable/button_all"
+                android:text="@string/add"
+                android:textAllCaps="false"
+                android:textSize="8pt"
+                android:typeface="normal" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mainBackground"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/hint_enterprise_text"
+                    android:textColor="@color/Grey"
+                    android:gravity="center"
+                    android:textSize="6pt" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <Button
+                        android:layout_marginTop="15dp"
+                        android:layout_marginRight="6dp"
+                        android:id="@+id/load_sample"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:textColor="@color/colorWhite"
+                        android:background="@drawable/button_all"
+                        android:text="@string/load_sample_map"
+                        android:textAllCaps="false"
+                        android:textSize="8pt"
+                        android:typeface="normal"
+                        android:layout_weight="1"/>
+
+                    <Button
+                        android:layout_marginTop="15dp"
+                        android:id="@+id/load_template"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:textColor="@color/colorWhite"
+                        android:background="@drawable/button_all"
+                        android:text="@string/load_template_map"
+                        android:textAllCaps="false"
+                        android:textSize="8pt"
+                        android:typeface="normal"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

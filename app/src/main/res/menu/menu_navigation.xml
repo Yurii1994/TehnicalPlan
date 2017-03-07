@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_profile"
+        android:title="@string/profile_name"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_profile" />
+
+    <item
+        android:id="@+id/menu_enterprise"
+        android:title="@string/menu_enterprise"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_enterprise" />
+
+    <item
+        android:id="@+id/menu_linking"
+        android:title="@string/linking_name"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_linking"
+        app:actionLayout="@layout/menu_counter"/>
+
+    <item
+        android:id="@+id/menu_exit"
+        android:title="@string/exit"
+        android:orderInCategory="1"
+        android:icon="@mipmap/ic_exit" />
+
+</menu>

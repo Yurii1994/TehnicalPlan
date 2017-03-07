@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/card_layout"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="9dp"
+    android:layout_marginLeft="9dp"
+    android:layout_marginRight="9dp"
+    android:visibility="gone">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/card_search"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/manager_header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:onClick="onClick"
+                android:background="?android:attr/selectableItemBackground">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_margin="12dp">
+
+                    <ImageView
+                        android:id="@+id/manager_photo"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:src="@drawable/profile_img"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="15dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="center">
+
+                        <TextView
+                            android:id="@+id/name_manager"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="8pt"
+                            android:textColor="@color/Grey"
+                            android:layout_marginBottom="8dp"/>
+
+                        <TextView
+                            android:id="@+id/name_enterprise"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="7pt"
+                            android:textColor="@color/GreyHint" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/detail_manager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="@color/colorPrimary">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/colorPrimary">
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:layout_margin="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="8pt"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/text_position"
+                        android:gravity="center"
+                        android:layout_marginBottom="10dp"/>
+
+                    <RelativeLayout
+                        android:id="@+id/progress_position"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:orientation="vertical">
+
+                        <ProgressBar
+                            android:theme="@style/LinearProgressWhite"
+                            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:indeterminate="true"
+                            android:layout_centerInParent="true"/>
+
+                    </RelativeLayout>
+
+                    <android.support.v7.widget.AppCompatSpinner
+                        android:id="@+id/spinner_position"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:spinnerMode="dialog"
+                        android:textColor="@color/colorWhite"
+                        android:textSize="8pt"
+                        android:layout_gravity="center"
+                        style="@style/Widget.AppCompat.Spinner.Underlined"
+                        android:theme="@style/ThemeSpinner"
+                        android:visibility="gone">
+
+                    </android.support.v7.widget.AppCompatSpinner>
+
+                    <TextView
+                        android:id="@+id/position_hint"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:textSize="8pt"
+                        android:textColor="@color/colorWhite"
+                        android:text="@string/not_position_error"
+                        android:gravity="center"
+                        android:visibility="gone"/>
+
+                    <Button
+                        android:layout_marginTop="10dp"
+                        android:id="@+id/manager_more"
+                        android:layout_width="wrap_content"
+                        android:layout_height="40dp"
+                        android:textColor="@drawable/button_more_text_color"
+                        android:layout_gravity="right"
+                        android:background="@drawable/button_more_background"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:textSize="7pt"
+                        android:typeface="normal"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>

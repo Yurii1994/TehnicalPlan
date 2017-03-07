@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/mainBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="15dp">
+
+                <EditText
+                    android:id="@+id/profile_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:layout_marginBottom="6dp"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/email"
+                    android:textSize="8pt"
+                    android:typeface="normal"/>
+
+                <EditText
+                    android:id="@+id/profile_login"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:layout_marginBottom="6dp"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/login"
+                    android:textSize="8pt"
+                    android:typeface="normal"/>
+
+
+                <EditText
+                    android:id="@+id/profile_password_old"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/password_old"
+                    android:textSize="8pt"
+                    android:typeface="normal"
+                    android:layout_marginBottom="6dp"/>
+
+                <EditText
+                    android:id="@+id/profile_password_new"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/password_new"
+                    android:textSize="8pt"
+                    android:typeface="normal"
+                    android:layout_marginBottom="6dp"/>
+
+                <EditText
+                    android:id="@+id/profile_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/code"
+                    android:textSize="8pt"
+                    android:typeface="normal"
+                    android:layout_marginBottom="6dp"
+                    android:maxLength="6"/>
+
+                <Button
+                    android:id="@+id/profile_send_code"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/colorWhite"
+                    android:background="@drawable/button_all"
+                    android:text="@string/send_code"
+                    android:textAllCaps="false"
+                    android:textSize="8pt"
+                    android:typeface="normal"
+                    android:layout_marginBottom="6dp"/>
+
+                <Button
+                    android:id="@+id/profile_change"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/colorWhite"
+                    android:background="@drawable/button_all"
+                    android:text="@string/update_save"
+                    android:textAllCaps="false"
+                    android:textSize="8pt"
+                    android:typeface="normal" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mainBackground"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_text"
+                    android:textColor="@color/Grey"
+                    android:gravity="center"
+                    android:textSize="6pt" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

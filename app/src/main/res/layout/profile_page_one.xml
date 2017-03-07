@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/mainBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorWhite">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="15dp">
+
+                <EditText
+                    android:id="@+id/profile_surname"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:layout_marginBottom="6dp"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/surname"
+                    android:textSize="8pt"
+                    android:typeface="normal"/>
+
+                <EditText
+                    android:id="@+id/profile_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:layout_marginBottom="6dp"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/name"
+                    android:textSize="8pt"
+                    android:typeface="normal"/>
+
+                <EditText
+                    android:id="@+id/profile_surname_father"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:textColor="@color/Grey"
+                    android:background="@drawable/edit_text_registration"
+                    android:layout_marginBottom="15dp"
+                    android:textColorHint="@color/GreyHint"
+                    android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                    android:gravity="center"
+                    android:textCursorDrawable="@drawable/color_cursor_all"
+                    android:textColorHighlight="@color/colorPrimary"
+                    android:hint="@string/surname_father"
+                    android:textSize="8pt"
+                    android:typeface="normal"/>
+
+                <ImageView
+                    android:id="@+id/profile_photo"
+                    android:layout_width="85dp"
+                    android:layout_height="85dp"
+                    android:src="@drawable/profile_img"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:clickable="true"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/type_account"
+                            android:textSize="8pt"
+                            android:textColor="@color/Grey"/>
+
+                    </LinearLayout>
+
+                    <RadioGroup
+                        android:id="@+id/profile_type_account"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_gravity="center">
+
+                        <RadioButton
+                            android:id="@+id/button_manager"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:text="@string/manager"
+                            android:textColor="@color/Grey"
+                            android:theme="@style/RadioButton"
+                            android:textSize="8pt"
+                            android:background="@color/transparent"
+                            android:layout_marginRight="20dp"/>
+
+                        <RadioButton
+                            android:id="@+id/button_performer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/performer"
+                            android:textColor="@color/Grey"
+                            android:theme="@style/RadioButton"
+                            android:textSize="8pt"
+                            android:background="@color/transparent"/>
+
+                    </RadioGroup>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/mainBackground"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="15dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/profile_text"
+                    android:textColor="@color/Grey"
+                    android:gravity="center"
+                    android:textSize="6pt" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+
