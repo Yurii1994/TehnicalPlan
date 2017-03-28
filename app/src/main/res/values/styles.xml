@@ -2,14 +2,51 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorControlNormal">@color/colorWhite</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="elevation">0dp</item>
+        <item name="colorAccent">@color/colorPrimary</item>
         <item name="android:textSelectHandle">@mipmap/apptheme_text_select_handle_middle</item>
         <item name="android:textSelectHandleLeft">@mipmap/apptheme_text_select_handle_left</item>
         <item name="android:textSelectHandleRight">@mipmap/apptheme_text_select_handle_right</item>
+        <item name="popupMenuStyle">@style/PopupMenu.MyAppTheme</item>
+
+        <item name="textAppearanceLargePopupMenu">@style/PopupMenuTextAppearanceLarge</item>
+        <item name="android:textAppearanceLargePopupMenu">@style/PopupMenuTextAppearanceLarge</item>
+        <item name="textAppearanceSmallPopupMenu">@style/PopupMenuTextAppearanceSmall</item>
+        <item name="android:textAppearanceSmallPopupMenu">@style/PopupMenuTextAppearanceSmall</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:itemTextAppearance">@style/CustomMenuTextAppearance</item>
+        <item name="android:colorBackground">@color/colorWhite</item>
+    </style>
+
+    <style name="CustomMenuTextAppearance" parent="@android:style/TextAppearance.Widget.IconMenu.Item">
+        <item name="android:textColor">@color/Grey</item>
+    </style>
+
+    <style name="PopupMenu.MyAppTheme" parent="Base.Widget.AppCompat.Light.PopupMenu.Overflow"/>
+
+
+    <style name="PopupMenuTextAppearanceSmall" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Small">
+        <item name="android:textColor">@color/Grey</item>
+    </style>
+    <style name="PopupMenuTextAppearanceLarge" parent="@style/TextAppearance.AppCompat.Light.Widget.PopupMenu.Large">
+        <item name="android:textColor">@color/Grey</item>
+    </style>
+
+
+    <style name="RadioButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/Grey</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
+
+    <style name="CheckBoxWhite" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">@color/colorWhite</item>
+        <item name="colorControlActivated">@color/colorWhite</item>
     </style>
 
     <style name="ThemeSpinner">
@@ -25,19 +62,5 @@
         <item name="colorAccent">@color/colorPrimary</item>
     </style>
 
-    <style name="toolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:editTextColor">@android:color/white</item>
-    </style>
 
-    <style name="RadioButton" parent="Theme.AppCompat.Light">
-        <item name="colorControlNormal">@color/Grey</item>
-        <item name="colorControlActivated">@color/colorPrimary</item>
-    </style>
-
-    <style name="CheckBoxWhite" parent="Theme.AppCompat.Light">
-        <item name="colorControlNormal">@color/colorWhite</item>
-        <item name="colorControlActivated">@color/colorWhite</item>
-    </style>
 </resources>

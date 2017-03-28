@@ -19,19 +19,10 @@ public class TabPagerFragmentAdapterRegistration extends FragmentPagerAdapter
     private PageOneRegistrationFragment pageOneFragment;
     private PageTwoRegistrationFragment pageTwoFragment;
 
-    private RegistrationActivity activity;
-
-    public void setTabPagerFragmentAdapter(TabPagerFragmentAdapterRegistration tabsPagerAdapter)
-    {
-        pageTwoFragment.setTabPagerFragment(tabsPagerAdapter);
-        pageOneFragment.setTabPagerFragment(tabsPagerAdapter);
-    }
-
-    public TabPagerFragmentAdapterRegistration(Context context, FragmentManager fm, RegistrationActivity activity)
+    public TabPagerFragmentAdapterRegistration(Context context, FragmentManager fm)
     {
         super(fm);
         initTabMap(context);
-        this.activity = activity;
     }
 
     @Override
@@ -50,46 +41,5 @@ public class TabPagerFragmentAdapterRegistration extends FragmentPagerAdapter
         pageTwoFragment = PageTwoRegistrationFragment.getInstance(context);
         tabs.put(0, pageOneFragment);
         tabs.put(1, pageTwoFragment);
-    }
-
-    public PageOneRegistrationFragment getPageOneFragment()
-    {
-        return pageOneFragment;
-    }
-
-    public String getPath()
-    {
-        return pageOneFragment.getPath();
-    }
-
-    public void onPressedBack()
-    {
-        activity.setState_back(true);
-        activity.onBackPressed();
-    }
-
-    public String getSurNameUser()
-    {
-        return pageOneFragment.getSurNameUser();
-    }
-
-    public String getNameUser()
-    {
-        return pageOneFragment.getNameUser();
-    }
-
-    public String getSurNameFatherUser()
-    {
-        return pageOneFragment.getSurNameFatherUser();
-    }
-
-    public int getTypeAccountUser()
-    {
-        return pageOneFragment.getTypeAccountUser();
-    }
-
-    public void setOnClickListener(DataUser dataUser, String path)
-    {
-        pageTwoFragment.setOnClickListener(dataUser, path);
     }
 }

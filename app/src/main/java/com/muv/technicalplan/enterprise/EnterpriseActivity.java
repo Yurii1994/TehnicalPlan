@@ -1,38 +1,32 @@
 package com.muv.technicalplan.enterprise;
 
 
-import android.app.Activity;
-import android.app.SearchManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AutoCompleteTextView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.muv.technicalplan.ConstantUrl;
+import com.muv.technicalplan.DialogFragmentProgress;
 import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
 import com.muv.technicalplan.UploadMultipart;
 import com.muv.technicalplan.data.DataMap;
-import com.muv.technicalplan.data.DataSearch;
+import com.muv.technicalplan.data.DataPosition;
 import com.muv.technicalplan.data.DataUser;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.security.AccessController.getContext;
 
 public class EnterpriseActivity extends AppCompatActivity
 {
@@ -46,6 +40,45 @@ public class EnterpriseActivity extends AppCompatActivity
     private JsonParser jsonParser = new JsonParser();
     private List<DataUser> user = DataUser.listAll(DataUser.class);
     private boolean update;
+    private DialogFragmentProgress dialog;
+    private final String UPDATE = "com.muv.action.UPDATE";
+    private BroadcastReceiver broadcastReceiver;
+    private List<FragmentPositionMap> fragmentPositionMaps;
+    private Toast toast;
+
+    public void setUpdate(boolean update) {
+        this.update = update;
+    }
+
+    public DialogFragmentProgress getDialog() {
+        return dialog;
+    }
+
+    public void dialogShow()
+    {
+        if (dialog != null)
+        {
+            if (!dialog.isShowing())
+            {
+
+                dialog.show(getFragmentManager(), "dialogFragment");
+                dialog.setCancelable(false);
+                dialog.setShowing(true);
+            }
+        }
+    }
+
+    public void dialogDismiss()
+    {
+        if (dialog != null)
+        {
+            if (dialog.isShowing())
+            {
+                dialog.dismiss();
+                dialog.setShowing(false);
+            }
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,6 +87,7 @@ public class EnterpriseActivity extends AppCompatActivity
 
         initToolbar();
         initTabs();
+        dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.save));
     }
 
     private void initToolbar()
@@ -76,76 +110,7 @@ public class EnterpriseActivity extends AppCompatActivity
                     switch (item.getItemId())
                     {
                         case R.id.menu_enterprise_save:
-                            List<Fragment> fragments =  adapter.getFragmentSettings().getRealFragments();
-                            List<FragmentPositionMap> fragmentPositionMaps = getDataMapFragment(getFragmentPosition(fragments));
-                            ConstantUrl constantUrl = new ConstantUrl();
-                            List<DataMap> dataMaps = getDataMap(fragmentPositionMaps);
-                            List<DataUser> user = DataUser.listAll(DataUser.class);
-                            System.out.println("EEE " + dataMaps);
-                            if (dataMaps.size() > 0)
-                            {
-                                for (int i = 0; i < dataMaps.size(); i++)
-                                {
-                                    try
-                                    {
-                                        if (dataMaps.get(i).getTAG().equals("ADD"))
-                                        {
-                                            String url = constantUrl.setUrlPositionMap(user.get(0).getLogin(),
-                                                    dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition());
-                                            UploadMultipart uploadMultipart = new UploadMultipart();
-                                            uploadMultipart.uploadSCV(getApplicationContext(), dataMaps.get(i).getPath(), url);
-                                            fragmentPositionMaps.get(i).setPath("");
-                                            fragmentPositionMaps.get(i).setPositionOld(dataMaps.get(i).getPosition());
-                                            update = true;
-                                        }
-                                        else
-                                        {
-                                            if (!dataMaps.get(i).getPath().equals(""))
-                                            {
-                                                String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
-                                                        dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(), dataMaps.get(i).getCode());
-                                                UploadMultipart uploadMultipart = new UploadMultipart();
-                                                uploadMultipart.uploadSCV(getApplicationContext(), dataMaps.get(i).getPath(), url);
-                                                fragmentPositionMaps.get(i).setPath("");
-                                                fragmentPositionMaps.get(i).setPositionOld(dataMaps.get(i).getPosition());
-                                                update = true;
-                                            }
-                                            else
-                                            {
-                                                String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
-                                                        dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(), dataMaps.get(i).getCode());
-                                                UpdatePosition updatePosition = new UpdatePosition(url);
-                                                updatePosition.execute();
-                                                fragmentPositionMaps.get(i).setPath("");
-                                                fragmentPositionMaps.get(i).setPositionOld(dataMaps.get(i).getPosition());
-                                                update = true;
-                                            }
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {}
-                                }
-                            }
-                            else
-                            {
-                                try
-                                {
-                                    if (!user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise()))
-                                    {
-                                        UpdateEnterprise updateEnterprise = new UpdateEnterprise(constantUrl.getUrlUpdateEnterprise(
-                                                user.get(0).getLogin(), adapter.getFragmentSettings().getEnterprise()));
-                                        updateEnterprise.execute();
-                                    }
-                                }
-                                catch (Exception e)
-                                {}
-                            }
-                            List<DataMap> dataMapsDelete = adapter.getFragmentSettings().getDataMapsDelete();
-                            if (dataMapsDelete.size() > 0)
-                            {
-                                Delete delete = new Delete(dataMapsDelete);
-                                delete.execute();
-                            }
+                            Save();
                             break;
                     }
                     return true;
@@ -154,6 +119,196 @@ public class EnterpriseActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        IntentFilter filter = new IntentFilter(UPDATE);
+        broadcastReceiver = new BroadcastReceiver()
+        {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+                String update = intent.getStringExtra("Update");
+                if (update.equals("position"))
+                {
+                    UpdatePositionInFragment updatePositionInFragment = new UpdatePositionInFragment(fragmentPositionMaps);
+                    updatePositionInFragment.execute();
+                }
+                else
+                if (update.equals("show_dialog"))
+                {
+                    dialogShow();
+                }
+                else
+                if (update.equals("dismiss_dialog"))
+                {
+                    dialogDismiss();
+                }
+            }
+        };
+        registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
+    }
+
+    class UpdatePositionInFragment extends AsyncTask<Void, Void, Void> {
+
+        private List<DataPosition> dataPosition;
+        private List<FragmentPositionMap> fragmentPositionMaps;
+
+        public UpdatePositionInFragment(List<FragmentPositionMap> fragmentPositionMaps)
+        {
+            this.fragmentPositionMaps = fragmentPositionMaps;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try
+            {
+                ConstantUrl constantUrl = new ConstantUrl();
+                List<DataUser> user = DataUser.listAll(DataUser.class);
+                String url = constantUrl.getUrlGetPosition(user.get(0).getLogin());
+                JsonParser jsonParser = new JsonParser();
+                dataPosition = jsonParser.parseGetPosition(url);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                dialogDismiss();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            super.onPostExecute(result);
+            for (int i = 0; i < fragmentPositionMaps.size(); i++)
+            {
+                try
+                {
+                    fragmentPositionMaps.get(i).setCode(dataPosition.get(i).getCode());
+                    fragmentPositionMaps.get(i).setName_table(dataPosition.get(i).getName_table());
+                    fragmentPositionMaps.get(i).setPath("");
+                    fragmentPositionMaps.get(i).setPositionOld(dataPosition.get(i).getPosition());
+                    fragmentPositionMaps.get(i).setTAG("CREATED");
+                }
+                catch (Exception e)
+                {}
+            }
+            dialogDismiss();
+            setUpdate(true);
+            MassageSaved();
+        }
+    }
+
+    private void Save()
+    {
+        List<Fragment> fragments =  adapter.getFragmentSettings().getRealFragments();
+        fragmentPositionMaps = getFragmentPosition(fragments);
+        List<FragmentPositionMap> fragmentPositionMapsForUpdate = getMapFragmentForUpdate(fragmentPositionMaps);
+        ConstantUrl constantUrl = new ConstantUrl();
+        List<DataMap> dataMaps = getDataMap(fragmentPositionMapsForUpdate);
+        List<DataUser> user = DataUser.listAll(DataUser.class);
+        if (dataMaps.size() > 0)
+        {
+            for (int i = 0; i < dataMaps.size(); i++)
+            {
+                try
+                {
+                    if (dataMaps.get(i).getTAG().equals("ADD"))
+                    {
+                        if (!dataMaps.get(i).getEnterprise().equals(""))
+                        {
+                            String url = constantUrl.setUrlPositionMap(user.get(0).getLogin(),
+                                    dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition());
+                            UploadMultipart uploadMultipart = new UploadMultipart();
+                            uploadMultipart.uploadSCV(getApplicationContext(), dataMaps.get(i).getPath(), url);
+                            fragmentPositionMapsForUpdate.get(i).setPath("");
+                            fragmentPositionMapsForUpdate.get(i).setPositionOld(dataMaps.get(i).getPosition());
+                        }
+                        else
+                        {
+                            showToastMessage(getResources().getText(R.string.not_enterprise_created).toString());
+                        }
+                    }
+                    else
+                    {
+                        if (!dataMaps.get(i).getPath().equals(""))
+                        {
+                            if (!dataMaps.get(i).getEnterprise().equals(""))
+                            {
+                                String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
+                                        dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(),
+                                        dataMaps.get(i).getCode(), dataMaps.get(i).getName_table(), true);
+                                UploadMultipart uploadMultipart = new UploadMultipart();
+                                uploadMultipart.uploadSCV(getApplicationContext(), dataMaps.get(i).getPath(), url);
+                                fragmentPositionMapsForUpdate.get(i).setPath("");
+                                fragmentPositionMapsForUpdate.get(i).setPositionOld(dataMaps.get(i).getPosition());
+                            }
+                            else
+                            {
+                                showToastMessage(getResources().getText(R.string.not_enterprise_created).toString());
+                            }
+
+                        }
+                        else
+                        {
+                            if (!dataMaps.get(i).getEnterprise().equals(""))
+                            {
+                                String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
+                                        dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(),
+                                        dataMaps.get(i).getCode(), dataMaps.get(i).getName_table(), false);
+                                UpdatePosition updatePosition = new UpdatePosition(url);
+                                updatePosition.execute();
+                                fragmentPositionMapsForUpdate.get(i).setPath("");
+                                fragmentPositionMapsForUpdate.get(i).setPositionOld(dataMaps.get(i).getPosition());
+                            }
+                            else
+                            {
+                                showToastMessage(getResources().getText(R.string.not_enterprise_created).toString());
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {}
+            }
+        }
+        else
+        {
+            try
+            {
+                if (!adapter.getFragmentSettings().getEnterprise().equals(""))
+                {
+                    if (!user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise()))
+                    {
+                        UpdateEnterprise updateEnterprise = new UpdateEnterprise(constantUrl.getUrlUpdateEnterprise(
+                                user.get(0).getLogin(), adapter.getFragmentSettings().getEnterprise()));
+                        updateEnterprise.execute();
+                    }
+                }
+                else
+                {
+                    showToastMessage(getResources().getText(R.string.not_enterprise_created).toString());
+                }
+            }
+            catch (Exception e)
+            {}
+        }
+        List<DataMap> dataMapsDelete = adapter.getFragmentSettings().getDataMapsDelete();
+        adapter.notifyDataSetChanged();
+        if (dataMapsDelete.size() > 0)
+        {
+            Delete delete = new Delete(dataMapsDelete);
+            delete.execute();
+        }
+    }
 
     private void getMassageSaveChange()
     {
@@ -162,12 +317,13 @@ public class EnterpriseActivity extends AppCompatActivity
         List<FragmentPositionMap> fragmentPositionMaps = getFragmentPosition(fragments);
         List<DataMap> dataMaps = getDataMap(fragmentPositionMaps);
         List<DataUser> user = DataUser.listAll(DataUser.class);
-        if (dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
-                || count != fragmentPositionMaps.size())
+        if (user.get(0).getEnterprise() != null & !adapter.getFragmentSettings().getEnterprise().equals(""))
         {
-            Toast toast = Toast.makeText(this, getResources().getText(R.string.not_save),
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            if (dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
+                    || count != fragmentPositionMaps.size())
+            {
+                showToastMessage(getResources().getText(R.string.not_save).toString());
+            }
         }
     }
 
@@ -184,16 +340,19 @@ public class EnterpriseActivity extends AppCompatActivity
         protected Void doInBackground(Void... params) {
             try
             {
+                dialogShow();
                 for (int i = 0; i < dataMapDelete.size(); i++)
                 {
                     ConstantUrl constantUrl = new ConstantUrl();
-                    String url = constantUrl.getUrlRemovePosition(user.get(0).getLogin(), dataMapDelete.get(i).getCode());
+                    String url = constantUrl.getUrlRemovePosition(user.get(0).getLogin(),
+                            dataMapDelete.get(i).getCode(), dataMapDelete.get(i).getName_table());
                     update = jsonParser.getUpdateEnterprise(url);
                 }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                dialogDismiss();
             }
             return null;
         }
@@ -204,6 +363,7 @@ public class EnterpriseActivity extends AppCompatActivity
             super.onPostExecute(result);
             MassageSaved();
             adapter.getFragmentSettings().setDataMapsDelete(new ArrayList<DataMap>());
+            dialogDismiss();
         }
     }
 
@@ -220,11 +380,13 @@ public class EnterpriseActivity extends AppCompatActivity
         protected Void doInBackground(Void... params) {
             try
             {
+                dialogShow();
                 update = jsonParser.getUpdateEnterprise(url);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                dialogDismiss();
             }
             return null;
         }
@@ -234,22 +396,19 @@ public class EnterpriseActivity extends AppCompatActivity
         {
             super.onPostExecute(result);
             MassageSaved();
+            dialogDismiss();
         }
     }
 
-    private void MassageSaved()
+    public void MassageSaved()
     {
         if (update)
         {
-            Toast toast = Toast.makeText(getApplicationContext(), getResources().getText(R.string.saved),
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            showToastMessage(getResources().getText(R.string.saved).toString());
         }
         else
         {
-            Toast toast = Toast.makeText(getApplicationContext(), getResources().getText(R.string.error_save),
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            showToastMessage(getResources().getText(R.string.error_save).toString());
         }
     }
 
@@ -266,11 +425,13 @@ public class EnterpriseActivity extends AppCompatActivity
         protected Void doInBackground(Void... params) {
             try
             {
+                dialogShow();
                 update = jsonParser.getUpdateEnterprise(url);
             }
             catch (Exception e)
             {
                 e.printStackTrace();
+                dialogDismiss();
             }
             return null;
         }
@@ -279,6 +440,7 @@ public class EnterpriseActivity extends AppCompatActivity
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
+            dialogDismiss();
         }
     }
 
@@ -297,6 +459,7 @@ public class EnterpriseActivity extends AppCompatActivity
                     dataMap.setPath(fragments.get(i).getPath());
                     dataMap.setTAG(fragments.get(i).getTAG());
                     dataMap.setCode(fragments.get(i).getCode());
+                    dataMap.setName_table(fragments.get(i).getName_table());
                     path.add(dataMap);
                 }
             }
@@ -304,7 +467,7 @@ public class EnterpriseActivity extends AppCompatActivity
         return path;
     }
 
-    public List<FragmentPositionMap> getDataMapFragment(List<FragmentPositionMap> fragments)
+    public List<FragmentPositionMap> getMapFragmentForUpdate(List<FragmentPositionMap> fragments)
     {
         List<FragmentPositionMap> result = new ArrayList<>();
         for (int i = 0; i < fragments.size(); i++)
@@ -348,7 +511,7 @@ public class EnterpriseActivity extends AppCompatActivity
     private void initTabs()
     {
         viewPager = (ViewPager)findViewById(R.id.view_pager_enterprise);
-        adapter = new TabsPagerFragmentAdapterEnterprise(this, getSupportFragmentManager());
+        adapter = new TabsPagerFragmentAdapterEnterprise(this, getSupportFragmentManager(), this);
 
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
@@ -410,17 +573,32 @@ public class EnterpriseActivity extends AppCompatActivity
         List<FragmentPositionMap> fragmentPositionMaps = getFragmentPosition(fragments);
         List<DataMap> dataMaps = getDataMap(fragmentPositionMaps);
         List<DataUser> user = DataUser.listAll(DataUser.class);
-        if ((dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
-                || count != fragmentPositionMaps.size()) & !update )
+        if (user.get(0).getEnterprise() != null & !adapter.getFragmentSettings().getEnterprise().equals(""))
         {
-            Toast toast = Toast.makeText(this, getResources().getText(R.string.not_save),
-                    Toast.LENGTH_SHORT);
-            toast.show();
-            update = true;
+            if ((dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
+                    || count != fragmentPositionMaps.size()) & !update )
+            {
+                showToastMessage(getResources().getText(R.string.not_save).toString());
+                update = true;
+            }
+            else
+            {
+                super.onBackPressed();
+            }
         }
         else
         {
             super.onBackPressed();
         }
+    }
+
+    public void showToastMessage(String a)
+    {
+        if (toast != null)
+        {
+            toast.cancel();
+        }
+        toast = Toast.makeText(getApplicationContext(), a, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }

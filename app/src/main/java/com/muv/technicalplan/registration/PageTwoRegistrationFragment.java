@@ -1,6 +1,7 @@
 package com.muv.technicalplan.registration;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -22,9 +23,12 @@ import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
 import com.muv.technicalplan.SaveLoadPreferences;
 import com.muv.technicalplan.UploadMultipart;
+import com.muv.technicalplan.profile.PageTwoProfileFragment;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
+import java.util.List;
 
 public class PageTwoRegistrationFragment extends AbstractTabFragment
 {
@@ -44,6 +48,20 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
     public String code;
     public boolean send_code;
     public static boolean registered;
+    private final String UPDATE = "com.muv.action.UPDATE";
+    private Toast toast;
+    private RegistrationActivity activity;
+    private DialogFragmentProgress dialog;
+
+    private void showToastMessage(String a)
+    {
+        if (toast != null)
+        {
+            toast.cancel();
+        }
+        toast = Toast.makeText(getContext(), a, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
 
     public static PageTwoRegistrationFragment getInstance(Context context)
@@ -55,14 +73,25 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
         return fragment;
     }
 
-    public void setTabPagerFragment(TabPagerFragmentAdapterRegistration fragmentTabPager)
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
     {
-        this.fragmentTabPager = fragmentTabPager;
+        super.onSaveInstanceState(outState);
+        outState.putString("Email", email.getText().toString());
+        outState.putString("Login", login.getText().toString());
+        outState.putString("Password_old", password.getText().toString());
+        outState.putString("CodeEdit", codeText.getText().toString());
+        outState.putString("Code", code);
+        outState.putBoolean("CodeSend", send_code);
     }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        context = getContext();
+        activity = (RegistrationActivity) getActivity();
+
         view = inflater.inflate(LAYOUT, container, false);
         email = (EditText)view.findViewById(R.id.registration_email);
         login = (EditText)view.findViewById(R.id.registration_login);
@@ -70,8 +99,23 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
         codeText = (EditText)view.findViewById(R.id.registration_code);
         getChangeKeyboard();
         codeBtn = (Button) view.findViewById(R.id.registration_send_code);
-        registrationBtn = (Button) view.findViewById(R.id.registration);return view;
+        registrationBtn = (Button) view.findViewById(R.id.registration);
 
+        OnClickListener onClickListener = new OnClickListener();
+        codeBtn.setOnClickListener(onClickListener);
+        registrationBtn.setOnClickListener(onClickListener);
+
+        if (savedInstanceState != null)
+        {
+            email.setText(savedInstanceState.getString("Email"));
+            login.setText(savedInstanceState.getString("Login"));
+            password.setText(savedInstanceState.getString("Password"));
+            codeText.setText(savedInstanceState.getString("CodeEdit"));
+            code = savedInstanceState.getString("Code");
+            send_code = savedInstanceState.getBoolean("CodeSend");
+        }
+
+        return view;
     }
 
     private void getChangeKeyboard()
@@ -126,124 +170,126 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
         return codeText.getText().toString();
     }
 
-    public void setOnClickListener(final DataUser dataUser, final String path)
-    {
-        codeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                String email = getEmailUser();
-                if (email.length() > 0)
-                {
-                    if (email.contains("@"))
-                    {
-                        if (internet.isOnline(context))
-                        {
-                            parseCode parseCode = new parseCode(email);
-                            parseCode.execute();
-                        }
-                        else
-                        {
-                            Toast toast = Toast.makeText(context, getResources().getText(R.string.not_network),
-                                    Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    }
-                    else
-                    {
-                        Toast toast = Toast.makeText(context, getResources().getText(R.string.not_email),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                }
-                else
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.email_code),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        });
 
-        registrationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
+    private class OnClickListener implements View.OnClickListener
+    {
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
             {
-                if (send_code)
-                {
-                    String email = getEmailUser();
-                    String login = getLoginUser();
-                    String password = getPasswordUser();
-                    String codeText = getCodeUser();
-                    if (email.length() > 0 & login.length() > 0 & password.length() > 0 & codeText.length() > 0)
+                case R.id.registration:
+                    if (send_code)
                     {
-                        if (code.equals(codeText))
+                        DataUser dataUser = activity.getDataUserPageOne(activity.getNameUser(),
+                                activity.getSurNameUser(), activity.getSurNameFatherUser(), activity.getTypeAccountUser());
+                        String path = activity.getPath();
+
+                        String email = getEmailUser();
+                        String login = getLoginUser();
+                        String password = getPasswordUser();
+                        String codeText = getCodeUser();
+                        if (email.length() > 0 & login.length() > 0 & password.length() > 0 & codeText.length() > 0)
                         {
-                            String surname = dataUser.getSurname();
-                            String name = dataUser.getName();
-                            String surname_father = dataUser.getSurname_father();
-                            int type_account = dataUser.getType_account();
-                            String enterprise = dataUser.getEnterprise();
-                            String position = dataUser.getPosition();
-                            String url_reg = "";
-                            try
+                            if (code.equals(codeText))
                             {
-                                url_reg = url.getUrlRegistrationOrUpdate(surname, name, surname_father,
-                                        login, password, email, type_account, enterprise, position, false, "");
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                            DataUser data = new DataUser();
-                            data.setName(name);
-                            data.setSurname(surname);
-                            data.setSurname_father(surname_father);
-                            data.setType_account(type_account);
-                            data.setEmail(email);
-                            data.setLogin(login);
-                            data.setEnterprise(enterprise);
-                            data.setPosition(position);
-                            data.setPassword(password);
-                            if (internet.isOnline(context))
-                            {
-                                parseRegistration parseRegistration = new parseRegistration(url_reg, data, path);
-                                parseRegistration.execute();
+                                String surname = dataUser.getSurname();
+                                String name = dataUser.getName();
+                                String surname_father = dataUser.getSurname_father();
+                                int type_account = dataUser.getType_account();
+                                String enterprise = "false";
+                                String position = "false";
+                                String name_table = "false";
+                                String url_reg = "";
+                                try
+                                {
+                                    url_reg = url.getUrlRegistrationOrUpdate(surname, name, surname_father,
+                                            login, password, email, type_account, enterprise, position, name_table, false, "");
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                                DataUser data = new DataUser();
+                                data.setName(name);
+                                data.setSurname(surname);
+                                data.setSurname_father(surname_father);
+                                data.setType_account(type_account);
+                                data.setEmail(email);
+                                data.setLogin(login);
+                                data.setEnterprise(enterprise);
+                                data.setPosition(position);
+                                data.setPassword(password);
+                                data.setName_table(name_table);
+                                if (internet.isOnline(context))
+                                {
+                                    parseRegistration parseRegistration = new parseRegistration(url_reg, data, path);
+                                    parseRegistration.execute();
+                                }
+                                else
+                                {
+                                    showToastMessage(getResources().getText(R.string.not_network).toString());
+                                }
                             }
                             else
                             {
-                                Toast toast = Toast.makeText(context, getResources().getText(R.string.not_network),
-                                        Toast.LENGTH_SHORT);
-                                toast.show();
+                                showToastMessage(getResources().getText(R.string.error_code).toString());
                             }
                         }
                         else
                         {
-                            Toast toast = Toast.makeText(context, getResources().getText(R.string.error_code),
-                                    Toast.LENGTH_SHORT);
-                            toast.show();
+                            showToastMessage(getResources().getText(R.string.fill_fields).toString());
                         }
                     }
                     else
                     {
-                        Toast toast = Toast.makeText(context, getResources().getText(R.string.fill_fields),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
+                        showToastMessage(getResources().getText(R.string.not_code).toString());
                     }
-                }
-                else
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.not_code),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
+                    break;
+
+                case R.id.registration_send_code:
+                    String email = getEmailUser();
+                    if (email.length() > 0)
+                    {
+                        if (email.contains("@"))
+                        {
+                            if (internet.isOnline(context))
+                            {
+                                parseCode parseCode = new parseCode(email);
+                                parseCode.execute();
+                            }
+                            else
+                            {
+                                showToastMessage(getResources().getText(R.string.not_network).toString());
+                            }
+                        }
+                        else
+                        {
+                            showToastMessage(getResources().getText(R.string.not_email).toString());
+                        }
+                    }
+                    else
+                    {
+                        showToastMessage(getResources().getText(R.string.email_code).toString());
+                    }
+                    break;
+
             }
-        });
+        }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        if (dialog!= null)
+        {
+            dialog.dismiss();
+        }
     }
 
     class parseRegistration extends AsyncTask<Void, Void, Void> {
 
-        DialogFragmentProgress dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.register_name));
         private String url;
         private String state_registration;
         private DataUser dataUser;
@@ -251,6 +297,7 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
 
         public parseRegistration(String url, DataUser dataUser, String path)
         {
+            dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.register_name));
             this.url = url;
             this.dataUser = dataUser;
             this.path = path;
@@ -275,48 +322,48 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
-            dialog.dismiss();
+            if (dialog != null)
+            {
+                dialog.dismiss();
+            }
             if (state_registration.contains("false"))
             {
                 if (state_registration.contains("false_emailANDfalse_login"))
                 {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.login_email_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
+                    showToastMessage(getResources().getText(R.string.login_email_too).toString());
                 }
                 else
                 if (state_registration.contains("false_email"))
                 {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.email_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
+                    showToastMessage(getResources().getText(R.string.email_too).toString());
                 }
                 else
                 {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.login_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
+                    showToastMessage(getResources().getText(R.string.login_too).toString());
                 }
             }
             else
             {
                 if (fragmentTabPager != null)
                 {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.registered),
-                            Toast.LENGTH_LONG);
-                    toast.show();
                     BaseUser baseUser = new BaseUser();
                     baseUser.createBase(dataUser);
-                    SaveLoadPreferences saveLoadPreferences = new SaveLoadPreferences();
                     registered = true;
-                    saveLoadPreferences.saveBooleanPreferences("SING_IN", "REGISTERED", true, context);
+
+                    Intent intent = new Intent(UPDATE);
+                    intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                    intent.putExtra("Update", "account");
+                    intent.putExtra("change", "false");
+                    intent.putExtra("registration", "true");
+                    getActivity().sendBroadcast(intent);
+
                     if (path != null)
                     {
                         ConstantUrl url = new ConstantUrl();
                         UploadMultipart uploadMultipart = new UploadMultipart();
                         uploadMultipart.uploadImage(context, path, url.getUrlUploadImage(dataUser.getLogin(), dataUser.getLogin()));
                     }
-                    fragmentTabPager.onPressedBack();
+                    activity.onPressedBack();
                 }
             }
         }
@@ -330,11 +377,11 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
 
     class parseCode extends AsyncTask<Void, Void, Void> {
 
-        DialogFragmentProgress dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.processing));
         private String email;
 
         public parseCode(String email)
         {
+            dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.processing));
             this.email = email;
         }
 
@@ -360,9 +407,7 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
             super.onPostExecute(result);
             dialog.dismiss();
             send_code = true;
-            Toast toast = Toast.makeText(context, getResources().getText(R.string.sended_code),
-                    Toast.LENGTH_LONG);
-            toast.show();
+            showToastMessage(getResources().getText(R.string.sended_code).toString());
         }
     }
 }

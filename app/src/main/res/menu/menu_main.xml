@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
@@ -7,5 +8,56 @@
         android:title="@string/refresh"
         android:icon="@mipmap/ic_refresh"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/save_filter"
+        android:title="@string/save_filter"
+        app:showAsAction="never"
+        android:visible="true"
+        android:checkable="true"/>
+
+    <item
+        android:title="@string/by_time">
+        <menu>
+            <group android:id="@+id/group_time"
+                android:checkableBehavior="single">
+
+                <item android:id="@+id/on_today_time"
+                    android:title="@string/on_today"/>
+
+                <item android:id="@+id/on_three_days_time"
+                    android:title="@string/on_three_days"/>
+
+                <item android:id="@+id/on_seven_days_time"
+                    android:title="@string/on_seven_days"/>
+
+                <item android:id="@+id/all_time"
+                    android:title="@string/all"/>
+
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:title="@string/by_type">
+        <menu>
+            <group android:id="@+id/group_type"
+                android:checkableBehavior="single">
+
+                <item android:id="@+id/all_type"
+                    android:title="@string/all"/>
+
+                <item android:id="@+id/on_today_type"
+                    android:title="@string/on_today"/>
+
+                <item android:id="@+id/overdue_type"
+                    android:title="@string/overdue"/>
+
+                <item android:id="@+id/completed_type"
+                    android:title="@string/completed"/>
+
+            </group>
+        </menu>
+    </item>
 
 </menu>

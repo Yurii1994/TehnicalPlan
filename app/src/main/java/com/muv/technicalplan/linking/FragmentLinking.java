@@ -17,6 +17,7 @@ import com.muv.technicalplan.ConstantUrl;
 import com.muv.technicalplan.Internet;
 import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
+import com.muv.technicalplan.RecyclerViewMargin;
 import com.muv.technicalplan.base.BaseLinking;
 import com.muv.technicalplan.base.BaseUsers;
 import com.muv.technicalplan.data.DataLinking;
@@ -30,10 +31,8 @@ import java.util.List;
 public class FragmentLinking extends AbstractTabFragment
 {
     private static final int LAYOUT = R.layout.fragment_linking;
-    private LinkingActivity activity;
     private RecyclerView recyclerView;
     private AdapterRecyclerLinking adapter;
-
     private ProgressWheel progressWheel;
     private TextView hint;
     private Internet internet = new Internet();
@@ -41,22 +40,18 @@ public class FragmentLinking extends AbstractTabFragment
     private JsonParser jsonParser = new JsonParser();
     private List<DataUser> user = DataUser.listAll(DataUser.class);
     private String login = user.get(0).getLogin();
+    private RecyclerViewMargin decoration;
 
-    public static FragmentLinking getInstance(Context context, LinkingActivity activity)
+    public static FragmentLinking getInstance(Context context)
     {
         Bundle args = new Bundle();
         FragmentLinking fragment = new FragmentLinking();
         fragment.setArguments(args);
         fragment.setContext(context);
         fragment.setTitle(context.getString(R.string.links));
-        fragment.setLinkingActivity(activity);
         return fragment;
     }
 
-    private void setLinkingActivity(LinkingActivity activity)
-    {
-        this.activity = activity;
-    }
 
     public void setVisibleHint()
     {
@@ -235,6 +230,9 @@ public class FragmentLinking extends AbstractTabFragment
         }
         recyclerView.removeAllViews();
         recyclerView.getRecycledViewPool().clear();
+        recyclerView.removeItemDecoration(decoration);
+        decoration = new RecyclerViewMargin(pxFromDp(10), linkedUser.size());
+        recyclerView.addItemDecoration(decoration);
         adapter.setData(linkedUser, linking);
         adapter.notifyDataSetChanged();
     }
@@ -249,10 +247,15 @@ public class FragmentLinking extends AbstractTabFragment
 
         recyclerView = (RecyclerView)view.findViewById(R.id.recycler_linked);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new AdapterRecyclerLinking(new ArrayList<DataUsers>(), new ArrayList<DataLinking>(), context, activity, this, recyclerView);
+        adapter = new AdapterRecyclerLinking(new ArrayList<DataUsers>(), new ArrayList<DataLinking>(), context, this, recyclerView);
         recyclerView.setAdapter(adapter);
 
         createActivity();
         return view;
+    }
+
+    private int pxFromDp(float dp)
+    {
+        return (int) Math.ceil(dp * context.getApplicationContext().getResources().getDisplayMetrics().density);
     }
 }

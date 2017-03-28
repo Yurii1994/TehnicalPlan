@@ -2,14 +2,12 @@ package com.muv.technicalplan.enterprise;
 
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
@@ -34,11 +32,8 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 
 public class FragmentSettings  extends AbstractTabFragment implements View.OnClickListener
@@ -57,6 +52,7 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
     private FragmentSettings fragmentSettings;
     private int count_created;
     private List<DataMap> dataMapsDelete = new ArrayList<>();
+    private EnterpriseActivity activity;
 
     public List<DataMap> getDataMapsDelete() {
         return dataMapsDelete;
@@ -74,14 +70,23 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         return count_created;
     }
 
-    public static FragmentSettings getInstance(Context context, String title)
+    public static FragmentSettings getInstance(Context context, String title, EnterpriseActivity activity)
     {
         Bundle args = new Bundle();
         FragmentSettings fragment = new FragmentSettings();
         fragment.setArguments(args);
         fragment.setContext(context);
         fragment.setTitle(title);
+        fragment.setEnterpriseActivity(activity);
         return fragment;
+    }
+
+    public EnterpriseActivity getEnterpriseActivity() {
+        return activity;
+    }
+
+    public void setEnterpriseActivity(EnterpriseActivity activity) {
+        this.activity = activity;
     }
 
     @Nullable
@@ -103,7 +108,7 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         Position position = new Position(url, progress, hint);
         position.execute();
         String enterpriseText = user.get(0).getEnterprise();
-        if (enterpriseText == null)
+        if (enterpriseText.equals("false"))
         {
             enterpriseText = "";
         }
@@ -143,6 +148,7 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         switch (v.getId())
         {
             case R.id.add_position:
+                hint.setVisibility(View.GONE);
                 List<Fragment> fragments =  getRealFragments();
                 Fragment fragment = fragments.get(fragments.size() - 1);
                 try
@@ -150,7 +156,8 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
                     FragmentPositionMap fragmentPositionMap = (FragmentPositionMap) fragment;
                     if (!fragmentPositionMap.getPosition().equals("") & fragmentPositionMap.getPath() != null)
                     {
-                        createFragment("ADD", "", null, null);
+                        activity.setUpdate(false);
+                        createFragment("ADD", "", null, null, null);
                     }
                     else
                     {
@@ -161,9 +168,8 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
                 }
                 catch (Exception e)
                 {
-                    createFragment("ADD", "", null, null);
+                    createFragment("ADD", "", null, null, null);
                 }
-                System.out.println("GGG" + id_notification);
                 break;
 
             case R.id.load_sample:
@@ -180,7 +186,6 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
     }
 
     private String download_name;
-    private Map<Integer, String> id_notification = new LinkedHashMap<>();
 
     public void downloadFile(final String name)
     {
@@ -237,11 +242,11 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         }
     }
 
-    public void createFragment(String TAG, String position, String path,  String code)
+    public void createFragment(String TAG, String position, String path,  String code, String name_table)
     {
         count_created++;
         transaction = getFragmentManager().beginTransaction();
-        FragmentPositionMap fragmentPositionMap = new FragmentPositionMap().newInstance(context, this, TAG, position, path, code);
+        FragmentPositionMap fragmentPositionMap = new FragmentPositionMap().newInstance(context, this, TAG, position, path, code, name_table);
         transaction.add(R.id.fragment_container, fragmentPositionMap);
         transaction.commit();
     }
@@ -269,11 +274,13 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
 
         private String url;
         private View progress;
+        private TextView hint;
 
         public Position(String url, View progress, TextView hint)
         {
             this.url = url;
             this.progress = progress;
+            this.hint = hint;
             progress.setVisibility(View.VISIBLE);
             hint.setVisibility(View.GONE);
         }
@@ -295,14 +302,24 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
-            if (dataPosition.size() > 0)
+            if (dataPosition != null)
             {
-                progress.setVisibility(View.GONE);
-                for (int i = 0; i < dataPosition.size(); i++)
+                if (dataPosition.size() > 0)
                 {
-                    createFragment("CREATED", dataPosition.get(i).getPosition(), "", dataPosition.get(i).getCode());
+                    progress.setVisibility(View.GONE);
+                    for (int i = 0; i < dataPosition.size(); i++)
+                    {
+                        createFragment("CREATED", dataPosition.get(i).getPosition(), "",
+                                dataPosition.get(i).getCode(), dataPosition.get(i).getName_table());
+                    }
+                }
+                else
+                {
+                    progress.setVisibility(View.GONE);
+                    hint.setVisibility(View.VISIBLE);
                 }
             }
+
         }
     }
 }

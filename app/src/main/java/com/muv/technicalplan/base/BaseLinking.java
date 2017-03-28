@@ -18,7 +18,8 @@ public class BaseLinking
             String position = data.get(i).getPosition();
             String code = data.get(i).getCode();
             String state = data.get(i).getState();
-            DataLinking base = new DataLinking(where_user, from_user, enterprise, position, code, state);
+            String name_table = data.get(i).getName_table();
+            DataLinking base = new DataLinking(where_user, from_user, enterprise, position, code, state, name_table);
             base.save();
         }
     }

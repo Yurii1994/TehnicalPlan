@@ -23,9 +23,17 @@ public class RecoveryActivity extends AppCompatActivity implements View.OnClickL
     private JsonParser jsonParser = new JsonParser();
 
     @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString("Email", email.getText().toString());
+    }
+
+    @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
         setContentView(LAYOUT);
         initToolbar(getResources().getText(R.string.recovery_name).toString());
 
@@ -33,6 +41,10 @@ public class RecoveryActivity extends AppCompatActivity implements View.OnClickL
         send.setOnClickListener(this);
         email = (EditText)findViewById(R.id.email);
 
+        if (savedInstanceState != null)
+        {
+            email.setText(savedInstanceState.getString("Email"));
+        }
     }
 
 

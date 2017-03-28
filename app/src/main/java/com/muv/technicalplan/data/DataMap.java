@@ -7,6 +7,15 @@ public class DataMap
     private String path;
     private String TAG;
     private String code;
+    private String name_table;
+
+    public String getName_table() {
+        return name_table;
+    }
+
+    public void setName_table(String name_table) {
+        this.name_table = name_table;
+    }
 
     public String getCode() {
         return code;

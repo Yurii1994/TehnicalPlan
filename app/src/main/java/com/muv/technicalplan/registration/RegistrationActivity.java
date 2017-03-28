@@ -2,6 +2,7 @@ package com.muv.technicalplan.registration;
 
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -12,6 +13,10 @@ import com.muv.technicalplan.ConstantTab;
 import com.muv.technicalplan.CustomViewPager;
 import com.muv.technicalplan.data.DataUser;
 import com.muv.technicalplan.R;
+import com.muv.technicalplan.profile.PageOneProfileFragment;
+import com.muv.technicalplan.profile.PageTwoProfileFragment;
+
+import java.util.List;
 
 public class RegistrationActivity extends AppCompatActivity
 {
@@ -20,7 +25,7 @@ public class RegistrationActivity extends AppCompatActivity
     private Toolbar toolbar;
     private CustomViewPager viewPager;
     private TabPagerFragmentAdapterRegistration adapter;
-    private DataUser dataUser = new DataUser();
+    private Toast toast;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -62,14 +67,12 @@ public class RegistrationActivity extends AppCompatActivity
 
     private void nextTab()
     {
-        String surname = adapter.getSurNameUser();
-        String name = adapter.getNameUser();
-        String surname_father = adapter.getSurNameFatherUser();
-        int type = adapter.getTypeAccountUser();
+        String surname = getSurNameUser();
+        String name = getNameUser();
+        String surname_father = getSurNameFatherUser();
+        int type = getTypeAccountUser();
         if (type != 0 & surname.length() > 0 & name.length() > 0 & surname_father.length() > 0)
         {
-            dataUser = getDataUserPageOne(name, surname, surname_father, type);
-            adapter.setOnClickListener(dataUser, adapter.getPath());
             showNextTab();
         }
         else
@@ -80,7 +83,49 @@ public class RegistrationActivity extends AppCompatActivity
         }
     }
 
-    private DataUser getDataUserPageOne(String name, String surname, String surname_father, int type_account)
+    public String getPath()
+    {
+        return getPageOneFragment().getPath();
+    }
+
+    public PageOneRegistrationFragment getPageOneFragment()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        PageOneRegistrationFragment pageOneRegistrationFragment = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                pageOneRegistrationFragment = (PageOneRegistrationFragment)fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return pageOneRegistrationFragment;
+    }
+
+    public String getSurNameUser()
+    {
+        return getPageOneFragment().getSurNameUser();
+    }
+
+    public String getNameUser()
+    {
+        return getPageOneFragment().getNameUser();
+    }
+
+    public String getSurNameFatherUser()
+    {
+        return getPageOneFragment().getSurNameFatherUser();
+    }
+
+    public int getTypeAccountUser()
+    {
+        return getPageOneFragment().getTypeAccountUser();
+    }
+
+    public DataUser getDataUserPageOne(String name, String surname, String surname_father, int type_account)
     {
         DataUser dataUser = new DataUser();
         dataUser.setName(name);
@@ -99,6 +144,12 @@ public class RegistrationActivity extends AppCompatActivity
             last_tab = true;
             invalidateOptionsMenu();
         }
+    }
+
+    public void onPressedBack()
+    {
+        setState_back(true);
+        onBackPressed();
     }
 
     private boolean state_back;
@@ -166,8 +217,7 @@ public class RegistrationActivity extends AppCompatActivity
     private void initTabs()
     {
         viewPager = (CustomViewPager) findViewById(R.id.view_pager_registration);
-        adapter = new TabPagerFragmentAdapterRegistration(this, getSupportFragmentManager(), this);
-        adapter.setTabPagerFragmentAdapter(adapter);
+        adapter = new TabPagerFragmentAdapterRegistration(this, getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);

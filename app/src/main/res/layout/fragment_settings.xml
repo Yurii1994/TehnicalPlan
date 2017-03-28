@@ -64,6 +64,7 @@
             </RelativeLayout>
 
             <TextView
+                android:layout_marginTop="6dp"
                 android:id="@+id/position_hint_enterprise"
                 android:layout_width="match_parent"
                 android:layout_height="45dp"

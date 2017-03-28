@@ -5,8 +5,8 @@
     <color name="mainBackground">#EEEEEE</color>
     <color name="GreyDivider">#E0E0E0</color>
     <color name="colorWhite">#ffffff</color>
-    <color name="colorBlack">#191919</color>
     <color name="Grey">#424242</color>
+    <color name="colorBlack">#191919</color>
     <color name="Blue">#B2EBF2</color>
     <color name="GreyHint">#9E9E9E</color>
     <color name="transparent">#00000000</color>

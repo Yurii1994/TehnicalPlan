@@ -18,8 +18,8 @@ public class BaseUser
         int type_account = dataUser.getType_account();
         String password = dataUser.getPassword();
         String image = dataUser.getImage();
-        String name_table = dataUser.getName_table();
-        DataUser base = new DataUser(name, surname, surname_father, enterprise, position,login, email, type_account, password, image, name_table);
+        String table_position = dataUser.getName_table();
+        DataUser base = new DataUser(name, surname, surname_father, enterprise, position,login, email, type_account, password, image, table_position);
         base.save();
     }
 

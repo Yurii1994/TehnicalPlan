@@ -3,6 +3,7 @@ package com.muv.technicalplan.linking;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -25,26 +26,28 @@ import com.muv.technicalplan.R;
 import com.muv.technicalplan.data.DataLinking;
 import com.muv.technicalplan.data.DataUser;
 import com.muv.technicalplan.data.DataUsers;
+import com.silencedut.expandablelayout.ExpandableLayout;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 
-public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecyclerLinking.ViewHolder>
+public class AdapterRecyclerLinking extends RecyclerView.Adapter<AdapterRecyclerLinking.ViewHolder>
 {
     private ConstantUrl url = new ConstantUrl();
     private List<DataUsers> dataUser = new ArrayList<>();
     private List<DataLinking> dataLinking = new ArrayList<>();
     private JsonParser jsonParser = new JsonParser();
     private Context context;
-    private LinkingActivity activity;
     private List<DataUser> user = DataUser.listAll(DataUser.class);
     private int type_account = user.get(0).getType_account();
     private String login = user.get(0).getLogin();
-    private Handler handler = new Handler();
     private FragmentLinking fragmentLinking;
+    private HashSet<Integer> mExpandedPositionSet = new HashSet<>();
+    private final String UPDATE = "com.muv.action.UPDATE";
 
     @Override
     public AdapterRecyclerLinking.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
@@ -86,7 +89,11 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
         holder.name.setText(name);
 
         String enterprise = dataUser.get(position).getEnterprise();
-        if (enterprise == null || enterprise.equals("null"))
+        if (type_account == 1)
+        {
+            enterprise = user.get(0).getEnterprise();
+        }
+        if (enterprise == null || enterprise.equals("false"))
         {
             if (type_account == 1)
             {
@@ -150,35 +157,14 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
             }
         }
 
-        handler.post(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-
-                headerHeight.add(holder.cardView.getHeight() - holder.detail.getHeight());
-                detailHeight.add(holder.detail.getHeight());
-                holder.detail.setVisibility(View.GONE);
-                holder.card_layout.setVisibility(View.VISIBLE);
-            }
-        });
-
-        holder.header.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                holder.detail.setVisibility(View.VISIBLE);
-                onProductDescriptionClicked(holder.cardView, position);
-            }
-        });
-
         holder.button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
                 String where = dataLinking.get(position).getWhere_user();
                 String from = dataLinking.get(position).getFrom_user();
-                String linkUrl = url.getUrlSetLinkingState(where, from, "true");
+                String name_table = dataLinking.get(position).getName_table();
+                String linkUrl = url.getUrlSetLinkingState(where, from, "true", name_table);
                 holder.button_refuse.setText(context.getText(R.string.link_two).toString());
                 holder.button.setVisibility(View.GONE);
                 LinkingStateRemove linking = new LinkingStateRemove(linkUrl, position, false, holder.name_enterprise);
@@ -195,7 +181,8 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
                 {
                     String where = dataLinking.get(position).getWhere_user();
                     String from = dataLinking.get(position).getFrom_user();
-                    String linkUrl = url.getUrlSetLinkingState(where, from, "false");
+                    String name_table = dataLinking.get(position).getName_table();
+                    String linkUrl = url.getUrlSetLinkingState(where, from, "false", name_table);
                     LinkingStateRemove linking = new LinkingStateRemove(linkUrl, position, true, holder.name_enterprise);
                     linking.execute();
                 }
@@ -209,6 +196,7 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
                 }
             }
         });
+        holder.updateItem(position);
     }
 
     class LinkingStateRemove extends AsyncTask<Void, Integer, Void>
@@ -253,7 +241,11 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
                 else
                 {
                     String enterprise = dataUser.get(position).getEnterprise();
-                    if (enterprise == null || enterprise.equals("null"))
+                    if (type_account == 1)
+                    {
+                        enterprise = user.get(0).getEnterprise();
+                    }
+                    if (enterprise == null || enterprise.equals("false"))
                     {
                         if (type_account == 1)
                         {
@@ -265,10 +257,19 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
                             enterprise = dataLinking.get(position).getEnterprise();
                         }
                     }
+
                     name_enterprise.setText(enterprise + " " + context.getText(R.string.link));
                     Toast toast = Toast.makeText(context, context.getText(R.string.link_hint),
                             Toast.LENGTH_SHORT);
                     toast.show();
+                }
+                if (type_account == 2)
+                {
+                    Intent intent = new Intent(UPDATE);
+                    intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                    intent.putExtra("Update", "account");
+                    intent.putExtra("change", "true");
+                    context.sendBroadcast(intent);
                 }
             }
             else
@@ -300,7 +301,7 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
     }
 
 
-    public static class ViewHolder extends RecyclerView.ViewHolder
+    class ViewHolder extends RecyclerView.ViewHolder
     {
         CardView cardView;
         ImageView photo;
@@ -309,9 +310,7 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
         Button button;
         Button button_refuse;
         TextView position;
-        LinearLayout card_layout;
-        LinearLayout header;
-        LinearLayout detail;
+        ExpandableLayout expandableLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -322,66 +321,50 @@ public class AdapterRecyclerLinking  extends RecyclerView.Adapter<AdapterRecycle
             name_enterprise = (TextView)itemView.findViewById(R.id.name_enterprise_linked);
             button = (Button)itemView.findViewById(R.id.linked_button);
             position = (TextView) itemView.findViewById(R.id.position_linked);
-            card_layout = (LinearLayout)itemView.findViewById(R.id.card_layout_linked);
-            header = (LinearLayout)itemView.findViewById(R.id.linked_header);
-            detail = (LinearLayout)itemView.findViewById(R.id.detail_linked);
             button_refuse = (Button)itemView.findViewById(R.id.linked_refuse_button);
+            expandableLayout = (ExpandableLayout) itemView.findViewById(R.id.expandable_layout_linked);
         }
-    }
 
-    private void onProductDescriptionClicked(CardView view, int pos)
-    {
-        toggleProductDescriptionHeight(view, pos);
-    }
-
-    private ArrayList<Integer> detailHeight = new ArrayList<>();
-    private ArrayList<Integer> headerHeight = new ArrayList<>();
-
-    private void toggleProductDescriptionHeight(final View card, int pos)
-    {
-        int minHeight = headerHeight.get(pos);
-        int maxHeight = minHeight + detailHeight.get(pos);
-        int card_height = card.getHeight();
-        if (card_height == minHeight)
-        {
-            ValueAnimator anim = ValueAnimator.ofInt(card.getMeasuredHeightAndState(), maxHeight);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        private void updateItem(final int position) {
+            expandableLayout.setOnExpandListener(new ExpandableLayout.OnExpandListener() {
                 @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    ViewGroup.LayoutParams layoutParams = card.getLayoutParams();
-                    layoutParams.height = val;
-                    card.setLayoutParams(layoutParams);
+                public void onExpand(boolean expanded)
+                {
+                    registerExpand(position);
                 }
             });
-            anim.start();
-        }
-        else
-        {
-            ValueAnimator anim = ValueAnimator.ofInt(card.getMeasuredHeightAndState(), minHeight);
-            anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                @Override
-                public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                    int val = (Integer) valueAnimator.getAnimatedValue();
-                    ViewGroup.LayoutParams layoutParams = card.getLayoutParams();
-                    layoutParams.height = val;
-                    card.setLayoutParams(layoutParams);
-                }
-            });
-            anim.start();
+            expandableLayout.setExpand(mExpandedPositionSet.contains(position));
         }
     }
+
+    private void registerExpand(int position) {
+        if (mExpandedPositionSet.contains(position)) {
+            removeExpand(position);
+        }else {
+            addExpand(position);
+        }
+    }
+
+    private void removeExpand(int position)
+    {
+        mExpandedPositionSet.remove(position);
+    }
+
+    private void addExpand(int position)
+    {
+        mExpandedPositionSet.add(position);
+    }
+
     private RecyclerView recyclerView;
 
     public AdapterRecyclerLinking(List<DataUsers> dataUser, List<DataLinking> dataLinking,
-           Context context, LinkingActivity activity, FragmentLinking fragmentLinking, RecyclerView recyclerView)
+           Context context, FragmentLinking fragmentLinking, RecyclerView recyclerView)
     {
         this.recyclerView = recyclerView;
         this.fragmentLinking = fragmentLinking;
         this.dataUser = dataUser;
         this.dataLinking = dataLinking;
         this.context = context;
-        this.activity = activity;
     }
 
     public void setData(List<DataUsers> dataUser, List<DataLinking> dataLinking)

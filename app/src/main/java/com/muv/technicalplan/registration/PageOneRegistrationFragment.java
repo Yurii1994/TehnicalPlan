@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
@@ -19,15 +18,19 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import com.muv.technicalplan.AbstractTabFragment;
 import com.muv.technicalplan.CircleImage;
 import com.muv.technicalplan.R;
+import com.muv.technicalplan.data.DataUser;
 
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 import java.io.IOException;
+import java.util.List;
+
 import static android.app.Activity.RESULT_OK;
 
 public class PageOneRegistrationFragment extends AbstractTabFragment
@@ -39,8 +42,10 @@ public class PageOneRegistrationFragment extends AbstractTabFragment
     private EditText surname_father;
     private RadioGroup type_account;
     private String path;
-    private TabPagerFragmentAdapterRegistration adapterRegistration;
     private ImageView photo;
+    private RegistrationActivity activity;
+    private String uriText;
+    private String type_account_text;
 
     public static PageOneRegistrationFragment getInstance(Context context)
     {
@@ -51,21 +56,31 @@ public class PageOneRegistrationFragment extends AbstractTabFragment
         return fragment;
     }
 
-    public void setTabPagerFragment(TabPagerFragmentAdapterRegistration adapterRegistration)
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
     {
-        this.adapterRegistration = adapterRegistration;
+        super.onSaveInstanceState(outState);
+        outState.putString("Surname", surname.getText().toString());
+        outState.putString("Name", name.getText().toString());
+        outState.putString("Surname_father", surname_father.getText().toString());
+        outState.putString("Path", path);
+        outState.putString("Uri", uriText);
+        outState.putString("Type_account", type_account_text);
     }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
+        context = getContext();
+        activity = (RegistrationActivity) getActivity();
 
         surname = (EditText)view.findViewById(R.id.registration_surname);
         name = (EditText)view.findViewById(R.id.registration_name);
         surname_father = (EditText)view.findViewById(R.id.registration_surname_father);
         type_account = (RadioGroup)view.findViewById(R.id.registration_type_account);
         photo = (ImageView)view.findViewById(R.id.registration_photo);
+        setRadioGroupListener();
 
         getChangeKeyboard();
         photo.setOnClickListener(new View.OnClickListener()
@@ -75,13 +90,62 @@ public class PageOneRegistrationFragment extends AbstractTabFragment
                 switch (v.getId()) {
                     case R.id.registration_photo:
                         DialogFragmentImageRegistration dialogFragmentImageRegistration = new DialogFragmentImageRegistration().newInstance(
-                                adapterRegistration.getPageOneFragment());
+                                activity.getPageOneFragment());
                         dialogFragmentImageRegistration.show(getFragmentManager(), "dialogFragment");
                         break;
                 }
             }
         });
+        if (savedInstanceState != null)
+        {
+            surname.setText(savedInstanceState.getString("Surname"));
+            name.setText(savedInstanceState.getString("Name"));
+            surname_father.setText(savedInstanceState.getString("Surname_father"));
+            path = savedInstanceState.getString("Path");
+            uriText = savedInstanceState.getString("Uri");
+            type_account_text = savedInstanceState.getString("Type_account");
+            if (uriText != null)
+            {
+                if (uriText.length() > 0)
+                {
+                    try
+                    {
+                        Uri uri = Uri.parse(uriText);
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), uri);
+                        photo.setImageBitmap(new CircleImage(context).transform(bitmap));
+                    }
+                    catch (Exception e)
+                    {}
+                }
+            }
+            if (type_account_text != null)
+            {
+                if (type_account_text.equals(context.getText(R.string.manager).toString()))
+                {
+                    RadioButton button = (RadioButton)view.findViewById(R.id.registration_button_manager);
+                    button.setChecked(true);
+                }
+                else
+                if (type_account_text.equals(context.getText(R.string.performer).toString()))
+                {
+                    RadioButton button = (RadioButton)view.findViewById(R.id.registration_button_performer);
+                    button.setChecked(true);
+                }
+            }
+        }
         return view;
+    }
+
+    public void setRadioGroupListener()
+    {
+        type_account.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId)
+            {
+                RadioButton radioButton = (RadioButton)view.findViewById(checkedId);
+                type_account_text = radioButton.getText().toString();
+            }
+        });
     }
 
     private void getChangeKeyboard()
@@ -166,6 +230,7 @@ public class PageOneRegistrationFragment extends AbstractTabFragment
             case 1:
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
+                    uriText = selectedImage.toString();
                     path = selectedImage.getPath();
                     try {
                         bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), selectedImage);

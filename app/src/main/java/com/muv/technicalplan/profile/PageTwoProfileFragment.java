@@ -1,6 +1,7 @@
 package com.muv.technicalplan.profile;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -15,8 +16,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.muv.technicalplan.AbstractTabFragment;
+import com.muv.technicalplan.base.BaseLinking;
+import com.muv.technicalplan.base.BaseMap;
 import com.muv.technicalplan.base.BaseUser;
 import com.muv.technicalplan.ConstantUrl;
+import com.muv.technicalplan.base.BaseUsers;
 import com.muv.technicalplan.data.DataUser;
 import com.muv.technicalplan.DialogFragmentProgress;
 import com.muv.technicalplan.Internet;
@@ -24,6 +28,7 @@ import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
 import com.muv.technicalplan.SaveLoadPreferences;
 import com.muv.technicalplan.UploadMultipart;
+import com.muv.technicalplan.main.MainActivity;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.PicassoTools;
 
@@ -37,7 +42,6 @@ public class PageTwoProfileFragment extends AbstractTabFragment
     private static final int LAYOUT = R.layout.profile_page_two;
     private JsonParser jsonParser = new JsonParser();
     private ConstantUrl url = new ConstantUrl();
-    private TabPagerFragmentAdapterProfile fragmentTabPager;
     private Internet internet = new Internet();
 
     private EditText email;
@@ -48,12 +52,30 @@ public class PageTwoProfileFragment extends AbstractTabFragment
     private Button codeBtn;
     private Button registrationBtn;
 
-    private String code;
     private boolean send_code;
     private List<DataUser> user;
-    private SaveLoadPreferences saveLoadPreferences = new SaveLoadPreferences();
     private boolean change_type_account;
     public static boolean changed_profile;
+    private final String UPDATE = "com.muv.action.UPDATE";
+    private Toast toast;
+    private String email_text;
+    private String login_text;
+    private String password_old_text;
+    private String password_new_text;
+    private String code;
+    private String code_edit;
+    private ProfileActivity activity;
+    private DialogFragmentProgress dialog;
+
+    private void showToastMessage(String a)
+    {
+        if (toast != null)
+        {
+            toast.cancel();
+        }
+        toast = Toast.makeText(getContext(), a, Toast.LENGTH_SHORT);
+        toast.show();
+    }
 
     public static PageTwoProfileFragment getInstance(Context context)
     {
@@ -64,15 +86,25 @@ public class PageTwoProfileFragment extends AbstractTabFragment
         return fragment;
     }
 
-    public void setTabPagerFragment(TabPagerFragmentAdapterProfile fragmentTabPager)
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
     {
-        this.fragmentTabPager = fragmentTabPager;
+        super.onSaveInstanceState(outState);
+        outState.putString("Email", email.getText().toString());
+        outState.putString("Login", login.getText().toString());
+        outState.putString("Password_old", password_old.getText().toString());
+        outState.putString("Password_new", password_new.getText().toString());
+        outState.putString("CodeEdit", codeView.getText().toString());
+        outState.putString("Code", code);
     }
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
+        context = getContext();
+
         email = (EditText)view.findViewById(R.id.profile_email);
         login = (EditText)view.findViewById(R.id.profile_login);
         password_old = (EditText)view.findViewById(R.id.profile_password_old);
@@ -80,22 +112,41 @@ public class PageTwoProfileFragment extends AbstractTabFragment
         codeView = (EditText)view.findViewById(R.id.profile_code);
         codeBtn = (Button) view.findViewById(R.id.profile_send_code);
         registrationBtn = (Button) view.findViewById(R.id.profile_change);
+        OnClickListener onClickListener = new OnClickListener();
+        codeBtn.setOnClickListener(onClickListener);
+        registrationBtn.setOnClickListener(onClickListener);
 
         user = DataUser.listAll(DataUser.class);
-        email.setText(user.get(0).getEmail());
-        login.setText(user.get(0).getLogin());
+        email_text = user.get(0).getEmail();
+        login_text = user.get(0).getLogin();
+        if (savedInstanceState != null)
+        {
+            email_text = savedInstanceState.getString("Email");
+            login_text = savedInstanceState.getString("Login");
+            password_old_text = savedInstanceState.getString("Password_old");
+            password_new_text = savedInstanceState.getString("Password_new");
+            code_edit = savedInstanceState.getString("CodeEdit");
+            code = savedInstanceState.getString("Code");
+            password_old.setText(password_old_text);
+            password_new.setText(password_new_text);
+            codeView.setText(code_edit);
+        }
+        email.setText(email_text);
+        login.setText(login_text);
+
         getChangeKeyboard();
         setLoginChangeListener();
         codeView.setVisibility(View.GONE);
         codeBtn.setVisibility(View.GONE);
         setEmailChangeListener();
+        activity = (ProfileActivity)getActivity();
         return view;
     }
 
     public void getChangeTypeAccount()
     {
         List<DataUser> user = DataUser.listAll(DataUser.class);
-        if (user.get(0).getType_account() != fragmentTabPager.getTypeAccountUser())
+        if (user.get(0).getType_account() != activity.getTypeAccountUser())
         {
             codeView.setVisibility(View.VISIBLE);
             codeBtn.setVisibility(View.VISIBLE);
@@ -239,194 +290,177 @@ public class PageTwoProfileFragment extends AbstractTabFragment
         });
     }
 
-    public void setOnClickListener(final DataUser dataUser, final String path)
+    private class OnClickListener implements View.OnClickListener
     {
-        codeBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
             {
-                String email = getEmailUser();
-                if (email.length() > 0)
-                {
-                    if (email.contains("@"))
-                    {
-                        if (internet.isOnline(context))
-                        {
-                            parseCode parseCode = new parseCode(email);
-                            parseCode.execute();
-                        }
-                        else
-                        {
-                            Toast toast = Toast.makeText(context, getResources().getText(R.string.not_network),
-                                    Toast.LENGTH_SHORT);
-                            toast.show();
-                        }
-                    }
-                    else
-                    {
-                        Toast toast = Toast.makeText(context, getResources().getText(R.string.not_email),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                }
-                else
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.email_code),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-            }
-        });
+                case R.id.profile_change:
+                    DataUser dataUser = activity.getDataUserPageOne(activity.getNameUser(),
+                            activity.getSurNameUser(), activity.getSurNameFatherUser(), activity.getTypeAccountUser());
+                    String path = activity.getPath();
 
-        registrationBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                String email = getEmailUser();
-                String login = getLoginUser();
-                String password = user.get(0).getPassword();
-                String password_old = getOldPasswordUser();
-                String password_new = getNewPasswordUser();
-                String codeText = getCodeUser();
-                String surname = dataUser.getSurname();
-                String name = dataUser.getName();
-                String surname_father = dataUser.getSurname_father();
-                int type_account = dataUser.getType_account();
-                List<DataUser> user = DataUser.listAll(DataUser.class);
-                String enterprise = user.get(0).getEnterprise();
-                String position = user.get(0).getPosition();
-                String new_login;
-                if (!changeEmail & !change_type_account)
-                {
-                    if (email.length() > 0 & login.length() > 0)
+                    String email = getEmailUser();
+                    String login = getLoginUser();
+                    String password = user.get(0).getPassword();
+                    String password_old = getOldPasswordUser();
+                    String password_new = getNewPasswordUser();
+                    String codeText = getCodeUser();
+                    String surname = dataUser.getSurname();
+                    String name = dataUser.getName();
+                    String surname_father = dataUser.getSurname_father();
+                    int type_account = dataUser.getType_account();
+                    List<DataUser> user = DataUser.listAll(DataUser.class);
+                    String enterprise = user.get(0).getEnterprise();
+                    String position = user.get(0).getPosition();
+                    String name_table = user.get(0).getName_table();
+                    String new_login;
+                    if (!changeEmail & !change_type_account)
                     {
-                        if (changeLogin)
+                        if (email.length() > 0 & login.length() > 0)
                         {
-                            new_login = login;
-                            login = loginBefore;
-                        }
-                        else
-                        {
-                            new_login = login;
-                        }
-                        if (password_new.length() > 0)
-                        {
-                            if (password_old.length() > 0)
+                            if (changeLogin)
                             {
-                                if (password.equals(password_old))
+                                new_login = login;
+                                login = loginBefore;
+                            }
+                            else
+                            {
+                                new_login = login;
+                            }
+                            if (password_new.length() > 0)
+                            {
+                                if (password_old.length() > 0)
                                 {
-                                    password = password_new;
-                                    setChangeUpload(surname, name, surname_father, login, password, email, type_account,
-                                            enterprise, position, new_login, path);
+                                    if (password.equals(password_old))
+                                    {
+                                        password = password_new;
+                                        setChangeUpload(surname, name, surname_father, login, password, email, type_account,
+                                                enterprise, position, name_table, new_login, path);
+                                    }
+                                    else
+                                    {
+                                        showToastMessage(getResources().getText(R.string.password_error).toString());
+                                    }
                                 }
                                 else
                                 {
-                                    Toast toast = Toast.makeText(context, getResources().getText(R.string.password_error),
-                                            Toast.LENGTH_SHORT);
-                                    toast.show();
+                                    showToastMessage(getResources().getText(R.string.password_old_not).toString());
                                 }
                             }
                             else
                             {
-                                Toast toast = Toast.makeText(context, getResources().getText(R.string.password_old_not),
-                                        Toast.LENGTH_SHORT);
-                                toast.show();
+                                setChangeUpload(surname, name, surname_father, login, password, email, type_account,
+                                        enterprise, position, name_table, new_login, path);
                             }
                         }
                         else
                         {
-                            setChangeUpload(surname, name, surname_father, login, password, email, type_account,
-                                    enterprise, position, new_login, path);
+                            showToastMessage(getResources().getText(R.string.fill_fields).toString());
                         }
                     }
                     else
                     {
-                        Toast toast = Toast.makeText(context, getResources().getText(R.string.fill_fields),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
-                }
-                else
-                {
-                    if (send_code)
-                    {
-                        if (email.length() > 0 & login.length() > 0 & codeText.length() > 0)
+                        if (send_code)
                         {
-                            if (code.equals(codeText))
+                            if (email.length() > 0 & login.length() > 0 & codeText.length() > 0)
                             {
-                                if (changeLogin)
+                                if (code.equals(codeText))
                                 {
-                                    new_login = login;
-                                    login = loginBefore;
-                                }
-                                else
-                                {
-                                    new_login = login;
-                                }
-                                if (password_new.length() > 0)
-                                {
-                                    if (password_old.length() > 0)
+                                    if (changeLogin)
                                     {
-                                        if (password.equals(password_old))
+                                        new_login = login;
+                                        login = loginBefore;
+                                    }
+                                    else
+                                    {
+                                        new_login = login;
+                                    }
+                                    if (password_new.length() > 0)
+                                    {
+                                        if (password_old.length() > 0)
                                         {
-                                            password = password_new;
-                                            setChangeUpload(surname, name, surname_father, login, password, email, type_account,
-                                                    enterprise, position, new_login, path);
+                                            if (password.equals(password_old))
+                                            {
+                                                password = password_new;
+                                                setChangeUpload(surname, name, surname_father, login, password, email, type_account,
+                                                        enterprise, position, name_table, new_login, path);
+                                            }
+                                            else
+                                            {
+                                                showToastMessage(getResources().getText(R.string.password_error).toString());
+                                            }
                                         }
                                         else
                                         {
-                                            Toast toast = Toast.makeText(context, getResources().getText(R.string.password_error),
-                                                    Toast.LENGTH_SHORT);
-                                            toast.show();
+                                            showToastMessage(getResources().getText(R.string.password_old_not).toString());
                                         }
                                     }
                                     else
                                     {
-                                        Toast toast = Toast.makeText(context, getResources().getText(R.string.password_old_not),
-                                                Toast.LENGTH_SHORT);
-                                        toast.show();
+                                        setChangeUpload(surname, name, surname_father, login, password, email, type_account,
+                                                enterprise, position, name_table, new_login, path);
                                     }
                                 }
                                 else
                                 {
-                                    setChangeUpload(surname, name, surname_father, login, password, email, type_account,
-                                            enterprise, position, new_login, path);
+                                    showToastMessage(getResources().getText(R.string.error_code).toString());
                                 }
                             }
                             else
                             {
-                                Toast toast = Toast.makeText(context, getResources().getText(R.string.error_code),
-                                        Toast.LENGTH_SHORT);
-                                toast.show();
+                                showToastMessage(getResources().getText(R.string.fill_fields).toString());
                             }
                         }
                         else
                         {
-                            Toast toast = Toast.makeText(context, getResources().getText(R.string.fill_fields),
-                                    Toast.LENGTH_SHORT);
-                            toast.show();
+                            showToastMessage(getResources().getText(R.string.not_code).toString());
+                        }
+                    }
+                    break;
+
+                case R.id.profile_send_code:
+                    String email_user = getEmailUser();
+                    if ( email_user.length() > 0)
+                    {
+                        if ( email_user.contains("@"))
+                        {
+                            if (internet.isOnline(context))
+                            {
+                                parseCode parseCode = new parseCode( email_user);
+                                parseCode.execute();
+                            }
+                            else
+                            {
+                                showToastMessage(getResources().getText(R.string.not_network).toString());
+                            }
+                        }
+                        else
+                        {
+                            showToastMessage(getResources().getText(R.string.not_email).toString());
                         }
                     }
                     else
                     {
-                        Toast toast = Toast.makeText(context, getResources().getText(R.string.not_code),
-                                Toast.LENGTH_SHORT);
-                        toast.show();
+                        showToastMessage(getResources().getText(R.string.email_code).toString());
                     }
-                }
+                    break;
+
             }
-        });
+        }
     }
 
     private void setChangeUpload(String surname, String name, String surname_father, String login,
                                  String password, String email, int type_account, String enterprise,
-                                 String position, String new_login, String path)
+                                 String position, String name_table, String new_login, String path)
     {
         String url_reg = "";
         try
         {
             url_reg = url.getUrlRegistrationOrUpdate(surname, name, surname_father,
-                    login, password, email, type_account, enterprise, position, true, new_login);
+                    login, password, email, type_account, enterprise, position, name_table, true, new_login);
         }
         catch (Exception e)
         {
@@ -449,15 +483,22 @@ public class PageTwoProfileFragment extends AbstractTabFragment
         }
         else
         {
-            Toast toast = Toast.makeText(context, getResources().getText(R.string.not_network),
-                    Toast.LENGTH_SHORT);
-            toast.show();
+            showToastMessage(getResources().getText(R.string.not_network).toString());
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (dialog != null)
+        {
+            dialog.dismiss();
         }
     }
 
     class parseRegistration extends AsyncTask<Void, Void, Void> {
 
-        DialogFragmentProgress dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.save));
+
         private String url;
         private String state_registration;
         private DataUser dataUser;
@@ -466,6 +507,7 @@ public class PageTwoProfileFragment extends AbstractTabFragment
 
         public parseRegistration(String url, DataUser dataUser, String path, String new_login)
         {
+            dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.save));
             this.url = url;
             this.dataUser = dataUser;
             this.path = path;
@@ -491,60 +533,91 @@ public class PageTwoProfileFragment extends AbstractTabFragment
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
-            dialog.dismiss();
-            if (state_registration.contains("false"))
+            if (dialog != null)
             {
-                if (state_registration.contains("false_emailANDfalse_login"))
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.login_email_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                else
-                if (state_registration.contains("false_email"))
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.email_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                else
-                {
-                    Toast toast = Toast.makeText(context, getResources().getText(R.string.login_too),
-                            Toast.LENGTH_SHORT);
-                    toast.show();
-                }
+                dialog.dismiss();
             }
-            else
+            if (state_registration != null)
             {
-                Toast toast = Toast.makeText(context, getResources().getText(R.string.saved),
-                        Toast.LENGTH_SHORT);
-                toast.show();
-                BaseUser baseUser = new BaseUser();
-                baseUser.createBase(dataUser);
-                changed_profile = true;
-                saveLoadPreferences.saveBooleanPreferences("SING_IN", "CHANGE_PROFILE", true, context);
-                ConstantUrl url = new ConstantUrl();
-                /*якщо тип акаута змінився удалить всі дані привязані до акаунта автоматов в php*/
-                if (path != null)
+                if (state_registration.contains("false"))
                 {
-                    UploadMultipart uploadMultipart = new UploadMultipart();
-                    uploadMultipart.uploadImage(context, path, url.getUrlUploadImage(dataUser.getLogin(), new_login));
-                }
-                else
-                {
-                    if (delete_image)
+                    if (state_registration.contains("false_emailANDfalse_login"))
                     {
-                        parseRemoveImage parseRemoveImage = new parseRemoveImage(url.getUrlDeleteImage(dataUser.getLogin()));
-                        parseRemoveImage.execute();
+                        showToastMessage(getResources().getText(R.string.login_email_too).toString());
                     }
                     else
-                    if (!dataUser.getLogin().equals(new_login))
+                    if (state_registration.contains("false_email"))
                     {
-                        parseRefreshImage parseRefreshImage = new parseRefreshImage(url.getUrlUpdateImageLogin(dataUser.getLogin(), new_login));
-                        parseRefreshImage.execute();
+                        showToastMessage(getResources().getText(R.string.email_too).toString());
+                    }
+                    else
+                    {
+                        showToastMessage(getResources().getText(R.string.login_too).toString());
                     }
                 }
-                fragmentTabPager.onPressedBack();
+                else
+                {
+                    BaseUser baseUser = new BaseUser();
+                    baseUser.createBase(dataUser);
+                    changed_profile = true;
+
+                    Intent intent = new Intent(UPDATE);
+                    intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                    intent.putExtra("Update", "account");
+                    if (change_type_account)
+                    {
+                        intent.putExtra("Full_update", "true");
+                    }
+                    else
+                    {
+                        intent.putExtra("Full_update", "false");
+                    }
+                    intent.putExtra("change", "true");
+                    getActivity().sendBroadcast(intent);
+
+                    ConstantUrl url = new ConstantUrl();
+                /*якщо тип акаута змінився удалить всі дані привязані до акаунта автоматов в php*/
+                    if (path != null)
+                    {
+                        UploadMultipart uploadMultipart = new UploadMultipart();
+                        uploadMultipart.uploadImage(context, path, url.getUrlUploadImage(dataUser.getLogin(), new_login));
+                    }
+                    else
+                    {
+                        if (delete_image)
+                        {
+                            parseRemoveImage parseRemoveImage = new parseRemoveImage(url.getUrlDeleteImage(dataUser.getLogin()));
+                            parseRemoveImage.execute();
+                        }
+                        else
+                        if (!dataUser.getLogin().equals(new_login))
+                        {
+                            parseRefreshImage parseRefreshImage = new parseRefreshImage(url.getUrlUpdateImageLogin(dataUser.getLogin(), new_login));
+                            parseRefreshImage.execute();
+                        }
+                    }
+                    if (change_type_account)
+                    {
+                        try
+                        {
+                            Runnable runnable = new Runnable() {
+                                public void run() {
+                                    BaseMap baseMap = new BaseMap();
+                                    baseMap.deleteBase();
+                                    BaseLinking baseLinking = new BaseLinking();
+                                    baseLinking.deleteBase();
+                                    BaseUsers baseUsers = new BaseUsers();
+                                    baseUsers.deleteBase();
+                                }
+                            };
+                            Thread thread = new Thread(runnable);
+                            thread.start();
+                        }
+                        catch (Exception e)
+                        {}
+                    }
+                    activity.onPressedBack();
+                }
             }
         }
     }
@@ -610,10 +683,6 @@ public class PageTwoProfileFragment extends AbstractTabFragment
             if (remove)
             {
                 PicassoTools.clearCache(Picasso.with(context));
-                saveLoadPreferences.saveStringPreferences("SING_IN", "NAME_PHOTO", "", context);
-                Toast toast = Toast.makeText(context, getResources().getText(R.string.deleted_image),
-                        Toast.LENGTH_SHORT);
-                toast.show();
             }
         }
     }
@@ -656,9 +725,7 @@ public class PageTwoProfileFragment extends AbstractTabFragment
             super.onPostExecute(result);
             dialog.dismiss();
             send_code = true;
-            Toast toast = Toast.makeText(context, getResources().getText(R.string.sended_code),
-                    Toast.LENGTH_LONG);
-            toast.show();
+            showToastMessage(getResources().getText(R.string.sended_code).toString());
         }
     }
 }

@@ -13,6 +13,15 @@ import com.afollestad.materialdialogs.MaterialDialog;
 public class DialogFragmentProgress extends DialogFragment
 {
     private String text_progress;
+    private boolean showing;
+
+    public boolean isShowing() {
+        return showing;
+    }
+
+    public void setShowing(boolean showing) {
+        this.showing = showing;
+    }
 
     public static DialogFragmentProgress newInstance(String text_progress){
 

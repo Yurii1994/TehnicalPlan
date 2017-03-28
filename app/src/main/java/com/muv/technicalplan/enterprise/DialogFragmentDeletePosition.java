@@ -13,7 +13,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.muv.technicalplan.R;
 
-public class DialogFragmentDeletePosition extends DialogFragment implements View.OnClickListener
+public class DialogFragmentDeletePosition extends DialogFragment
 {
     private FragmentPositionMap fragmentPositionMap;
 
@@ -58,16 +58,4 @@ public class DialogFragmentDeletePosition extends DialogFragment implements View
                 })
                 .build();
     }
-
-    @Override
-    public void onClick(View v)
-    {
-        switch (v.getId())
-        {
-            case R.id.delete_send_code:
-
-                break;
-        }
-    }
-
 }

@@ -6,20 +6,20 @@
         <shape android:shape="rectangle"  >
             <corners android:radius="3dp" />
             <stroke android:width="1dip"
-                android:color="@color/colorPrimaryDark" />
+                android:color="@color/GreyDivider" />
             <gradient android:angle="-90"
-                android:startColor="@color/colorPrimaryDark"
-                android:endColor="@color/colorPrimaryDark"  />
+                android:startColor="@color/GreyDivider"
+                android:endColor="@color/GreyDivider"  />
         </shape>
     </item>
     <item >
         <shape android:shape="rectangle"  >
             <corners android:radius="3dp" />
             <stroke android:width="1dip"
-                android:color="@color/colorPrimary" />
+                android:color="@color/colorWhite" />
             <gradient android:angle="-90"
-                android:startColor="@color/colorPrimary"
-                android:endColor="@color/colorPrimary" />
+                android:startColor="@color/colorWhite"
+                android:endColor="@color/colorWhite" />
         </shape>
     </item>
 </selector>

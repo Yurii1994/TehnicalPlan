@@ -1,10 +1,10 @@
 package com.muv.technicalplan.profile;
 
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -14,9 +14,9 @@ import android.widget.Toast;
 import com.muv.technicalplan.ConstantTab;
 import com.muv.technicalplan.ConstantUrl;
 import com.muv.technicalplan.CustomViewPager;
-import com.muv.technicalplan.data.DataUser;
 import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
+import com.muv.technicalplan.data.DataUser;
 
 import java.util.List;
 
@@ -26,7 +26,6 @@ public class ProfileActivity extends AppCompatActivity
     private Toolbar toolbar;
     private CustomViewPager viewPager;
     private TabPagerFragmentAdapterProfile adapter;
-    private DataUser dataUser = new DataUser();
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -63,6 +62,7 @@ public class ProfileActivity extends AppCompatActivity
                     case R.id.menu_delete:
                         DialogFragmentDeleteAccount deleteAccount = new DialogFragmentDeleteAccount().newInstance(activity);
                         deleteAccount.setDialog(deleteAccount);
+                        deleteAccount.setCancelable(false);
                         deleteAccount.show(getSupportFragmentManager(), "dialogFragment");
                         break;
                 }
@@ -118,15 +118,13 @@ public class ProfileActivity extends AppCompatActivity
 
     private void nextTab()
     {
-        String surname = adapter.getSurNameUser();
-        String name = adapter.getNameUser();
-        String surname_father = adapter.getSurNameFatherUser();
-        int type = adapter.getTypeAccountUser();
+        String surname = getSurNameUser();
+        String name = getNameUser();
+        String surname_father = getSurNameFatherUser();
+        int type = getTypeAccountUser();
         if (type != 0 & surname.length() > 0 & name.length() > 0 & surname_father.length() > 0)
         {
-            dataUser = getDataUserPageOne(name, surname, surname_father, type);
-            adapter.setOnClickListener(dataUser, adapter.getPath());
-            adapter.getChangeTypeAccount();
+            getChangeTypeAccount();
             showNextTab();
         }
         else
@@ -137,8 +135,71 @@ public class ProfileActivity extends AppCompatActivity
         }
     }
 
+    public String getPath()
+    {
+        return getPageOneFragment().getPath();
+    }
 
-    private DataUser getDataUserPageOne(String name, String surname, String surname_father, int type_account)
+    public PageOneProfileFragment getPageOneFragment()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        PageOneProfileFragment pageOneProfileFragment = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                pageOneProfileFragment = (PageOneProfileFragment)fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return pageOneProfileFragment;
+    }
+
+    public PageTwoProfileFragment getPageTwoFragment()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        PageTwoProfileFragment pageTwoProfileFragment = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                pageTwoProfileFragment = (PageTwoProfileFragment) fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return pageTwoProfileFragment;
+    }
+
+    public void getChangeTypeAccount()
+    {
+        getPageTwoFragment().getChangeTypeAccount();
+    }
+
+    public String getSurNameUser()
+    {
+        return getPageOneFragment().getSurNameUser();
+    }
+
+    public String getNameUser()
+    {
+        return getPageOneFragment().getNameUser();
+    }
+
+    public String getSurNameFatherUser()
+    {
+        return getPageOneFragment().getSurNameFatherUser();
+    }
+
+    public int getTypeAccountUser()
+    {
+        return getPageOneFragment().getTypeAccountUser();
+    }
+
+    public DataUser getDataUserPageOne(String name, String surname, String surname_father, int type_account)
     {
         DataUser dataUser = new DataUser();
         dataUser.setName(name);
@@ -175,12 +236,17 @@ public class ProfileActivity extends AppCompatActivity
         {
             setState_back(true);
         }
-
     }
 
     public void setState_back(boolean state)
     {
         state_back = state;
+    }
+
+    public void onPressedBack()
+    {
+        setState_back(true);
+        onBackPressed();
     }
 
     @Override
@@ -225,8 +291,7 @@ public class ProfileActivity extends AppCompatActivity
     private void initTabs()
     {
         viewPager = (CustomViewPager) findViewById(R.id.view_pager_profile);
-        adapter = new TabPagerFragmentAdapterProfile(this, getSupportFragmentManager(), this);
-        adapter.setTabPagerFragmentAdapter(adapter);
+        adapter = new TabPagerFragmentAdapterProfile(this, getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
         viewPager.setPagingEnabled(false);

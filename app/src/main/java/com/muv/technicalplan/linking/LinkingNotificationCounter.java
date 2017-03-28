@@ -76,24 +76,27 @@ public class LinkingNotificationCounter
         protected void onPostExecute(Void result)
         {
             super.onPostExecute(result);
-            for (int i = 0; i < linkingWhere.size(); i++)
+            if (linkingWhere != null)
             {
-                linking.add(linkingWhere.get(i));
-            }
-            for (int i = 0; i < linkingFrom.size(); i++)
-            {
-                linking.add(linkingFrom.get(i));
-            }
-            linking = getSorted(linking);
-            List<DataLinking> old_linking = DataLinking.listAll(DataLinking.class);
-            old_linking = getSorted(old_linking);
-            if (linking.size() == 0 & old_linking.size() == 0)
-            {
-                setMenuCounter(item_id, 0);
-            }
-            else
-            {
-                setMenuCounter(item_id, linking.size() - old_linking.size());
+                for (int i = 0; i < linkingWhere.size(); i++)
+                {
+                    linking.add(linkingWhere.get(i));
+                }
+                for (int i = 0; i < linkingFrom.size(); i++)
+                {
+                    linking.add(linkingFrom.get(i));
+                }
+                linking = getSorted(linking);
+                List<DataLinking> old_linking = DataLinking.listAll(DataLinking.class);
+                old_linking = getSorted(old_linking);
+                if (linking.size() == 0 & old_linking.size() == 0)
+                {
+                    setMenuCounter(item_id, 0);
+                }
+                else
+                {
+                    setMenuCounter(item_id, linking.size() - old_linking.size());
+                }
             }
         }
     }

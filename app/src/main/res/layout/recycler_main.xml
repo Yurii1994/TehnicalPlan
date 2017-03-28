@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView android:id="@+id/card_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.muv.technicalplan.expandableLayout.ExpandableLayout
+        android:id="@+id/expandable_layout_main"
+        app:expWithParentScroll="true"
+        app:expDuration = "200"
+        app:expExpandScrollTogether = "false"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:id="@+id/code_map_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_margin="15dp">
+
+                        <TextView
+                            android:id="@+id/code_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="8pt"
+                            android:textColor="@color/Grey" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_toRightOf="@+id/code_map_layout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp">
+
+                        <TextView
+                            android:id="@+id/position_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textSize="7pt"
+                            android:textColor="@color/Grey"/>
+
+                        <TextView
+                            android:id="@+id/general_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textSize="7pt"
+                            android:textColor="@color/Grey"/>
+
+                        <TextView
+                            android:id="@+id/relative_map"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textSize="7pt"
+                            android:textColor="@color/Grey" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/card_menu"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="@drawable/button_menu"
+                        android:clickable="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginRight="3dp">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:padding="10dp"
+                            android:src="@mipmap/ic_menu_popup"
+                            android:layout_gravity="center" />
+
+                    </LinearLayout>
+
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/date_map"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="7pt"
+                    android:textColor="@color/Grey"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"/>
+
+                <TextView
+                    android:id="@+id/date_map_expected"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="7pt"
+                    android:textColor="@color/Grey"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"/>
+
+                <TextView
+                    android:id="@+id/description_map"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="15dp"
+                    android:textSize="7pt"
+                    android:textColor="@color/GreyHint" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/comments_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorPrimary">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_margin="15dp">
+
+                <LinearLayout
+                    android:id="@+id/comment_manager_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:text="@string/comment_manager"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="7pt"
+                        android:textColor="@color/colorWhite"
+                        android:gravity="center"
+                        android:layout_marginBottom="7dp"/>
+
+                    <EditText
+                        android:id="@+id/comment_manager_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorWhite"
+                        android:textColorHint="@color/colorWhite"
+                        android:background="@drawable/edit_text_main"
+                        android:textCursorDrawable="@drawable/color_cursor"
+                        android:textColorHighlight="@color/Blue"
+                        android:textSize="7pt"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp"
+                        android:paddingLeft="6dp"
+                        android:paddingRight="6dp" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/comment_performer_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:text="@string/comment_performer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="7pt"
+                        android:textColor="@color/colorWhite"
+                        android:gravity="center"
+                        android:layout_marginBottom="7dp"/>
+
+                    <EditText
+                        android:id="@+id/comment_performer_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/colorWhite"
+                        android:textColorHint="@color/colorWhite"
+                        android:background="@drawable/edit_text_main"
+                        android:textCursorDrawable="@drawable/color_cursor"
+                        android:textColorHighlight="@color/Blue"
+                        android:textSize="7pt"
+                        android:paddingTop="13dp"
+                        android:paddingBottom="13dp"
+                        android:paddingLeft="6dp"
+                        android:paddingRight="6dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.muv.technicalplan.expandableLayout.ExpandableLayout>
+
+</android.support.v7.widget.CardView>

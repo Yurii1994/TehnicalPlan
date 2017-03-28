@@ -22,10 +22,12 @@ public class TabsPagerFragmentAdapterEnterprise extends FragmentStatePagerAdapte
     private FragmentSettings fragmentSettings;
     private FragmentReport fragmentReport;
     public static TabsPagerFragmentAdapterEnterprise adapter;
+    private EnterpriseActivity activity;
 
-    public TabsPagerFragmentAdapterEnterprise(Context context, FragmentManager fm) {
+    public TabsPagerFragmentAdapterEnterprise(Context context, FragmentManager fm, EnterpriseActivity activity) {
         super(fm);
         this.fragmentManager = fm;
+        this.activity = activity;
         initTabMap(context);
     }
 
@@ -52,7 +54,7 @@ public class TabsPagerFragmentAdapterEnterprise extends FragmentStatePagerAdapte
     private void initTabMap(Context context) {
         tabs = new HashMap<>();
         adapter = this;
-        fragmentSettings = FragmentSettings.getInstance(context, context.getText(R.string.settings_enterprise).toString());
+        fragmentSettings = FragmentSettings.getInstance(context, context.getText(R.string.settings_enterprise).toString(), activity);
         fragmentReport = FragmentReport.getInstance(context, context.getText(R.string.report_enterprise).toString());
         tabs.put(0, fragmentReport);
         tabs.put(1, fragmentSettings);

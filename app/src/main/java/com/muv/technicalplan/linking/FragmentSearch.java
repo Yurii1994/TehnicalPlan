@@ -17,6 +17,7 @@ import com.muv.technicalplan.ConstantUrl;
 import com.muv.technicalplan.Internet;
 import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.R;
+import com.muv.technicalplan.RecyclerViewMargin;
 import com.muv.technicalplan.data.DataSearch;
 import com.muv.technicalplan.data.DataUser;
 import com.pnikosis.materialishprogress.ProgressWheel;
@@ -39,6 +40,7 @@ public class FragmentSearch extends AbstractTabFragment
     private JsonParser jsonParser = new JsonParser();
     private List<DataUser> user = DataUser.listAll(DataUser.class);
     private int type_account = user.get(0).getType_account();
+    private RecyclerViewMargin decoration;
 
     public boolean getStateLinking()
     {
@@ -81,6 +83,11 @@ public class FragmentSearch extends AbstractTabFragment
         progressWheel.setVisibility(View.GONE);
 
         return view;
+    }
+
+    private int pxFromDp(float dp)
+    {
+        return (int) Math.ceil(dp * context.getApplicationContext().getResources().getDisplayMetrics().density);
     }
 
     public void getSearch(String query)
@@ -267,6 +274,9 @@ public class FragmentSearch extends AbstractTabFragment
                 progressWheel.setVisibility(View.GONE);
                 hint.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
+                recyclerView.removeItemDecoration(decoration);
+                decoration = new RecyclerViewMargin(pxFromDp(10), dataSearches.size());
+                recyclerView.addItemDecoration(decoration);
                 Toast toast = Toast.makeText(context, getResources().getText(R.string.search_error),
                         Toast.LENGTH_SHORT);
                 toast.show();
@@ -276,6 +286,9 @@ public class FragmentSearch extends AbstractTabFragment
                 adapter.setData(dataSearches);
                 adapter.notifyDataSetChanged();
                 progressWheel.setVisibility(View.GONE);
+                recyclerView.removeItemDecoration(decoration);
+                decoration = new RecyclerViewMargin(pxFromDp(10), dataSearches.size());
+                recyclerView.addItemDecoration(decoration);
                 recyclerView.setVisibility(View.VISIBLE);
                 activity.searchViewClearFocus();
             }
@@ -285,6 +298,9 @@ public class FragmentSearch extends AbstractTabFragment
     public void setDataSearches(List<DataSearch> list)
     {
         recyclerView.removeAllViews();
+        recyclerView.removeItemDecoration(decoration);
+        decoration = new RecyclerViewMargin(pxFromDp(10), dataSearches.size());
+        recyclerView.addItemDecoration(decoration);
         adapter.setRefresh();
         adapter.setData(list);
         adapter.notifyDataSetChanged();

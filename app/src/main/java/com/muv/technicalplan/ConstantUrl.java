@@ -48,8 +48,8 @@ public class ConstantUrl
     }
 
     public String getUrlRegistrationOrUpdate(String surname, String name, String surname_father,
-            String login, String password, String email, int type_account, String enterprise, String position
-            , boolean update, String new_login) throws Exception
+            String login, String password, String email, int type_account, String enterprise, String position, String name_table,
+                                             boolean update, String new_login) throws Exception
     {
         StringBuilder stringBuilder = new StringBuilder(url_php_user);
         stringBuilder.append(action_insert);
@@ -60,23 +60,11 @@ public class ConstantUrl
         stringBuilder.append(this.surname_father);
         stringBuilder.append(URLEncoder.encode(surname_father, "UTF-8"));
         stringBuilder.append(this.enterprise);
-        if (enterprise == null)
-        {
-            stringBuilder.append(URLEncoder.encode("null", "UTF-8"));
-        }
-        else
-        {
-            stringBuilder.append(URLEncoder.encode(enterprise, "UTF-8"));
-        }
+        stringBuilder.append(URLEncoder.encode(enterprise, "UTF-8"));
         stringBuilder.append(this.position);
-        if (position == null)
-        {
-            stringBuilder.append(URLEncoder.encode("null", "UTF-8"));
-        }
-        else
-        {
-            stringBuilder.append(URLEncoder.encode(position, "UTF-8"));
-        }
+        stringBuilder.append(URLEncoder.encode(position, "UTF-8"));
+        stringBuilder.append(this.name_table);
+        stringBuilder.append(URLEncoder.encode(name_table, "UTF-8"));
         stringBuilder.append(this.login);
         stringBuilder.append(URLEncoder.encode(login, "UTF-8"));
         stringBuilder.append(this.email);
@@ -179,6 +167,7 @@ public class ConstantUrl
     }
 
     private String url_php_position = "http://www.technicalplan.ho.ua/position.php?";
+    private String delete_table = "&delete_table=";
 
     public String getUrlGetPosition(String login)
     {
@@ -198,7 +187,8 @@ public class ConstantUrl
         return stringBuilder.toString();
     }
 
-    public String setUrlPositionMapRefresh(String login, String enterprise, String position, String code) throws Exception
+    public String setUrlPositionMapRefresh(String login, String enterprise, String position, String code,
+                                           String name_table, boolean delete_table) throws Exception
     {
         StringBuilder stringBuilder = new StringBuilder(url_php_position);
         stringBuilder.append(action_insert);
@@ -211,12 +201,41 @@ public class ConstantUrl
         stringBuilder.append(this.refresh);
         stringBuilder.append(this.code);
         stringBuilder.append(URLEncoder.encode(code, "UTF-8"));
+        stringBuilder.append(this.name_table);
+        stringBuilder.append(URLEncoder.encode(name_table, "UTF-8"));
+        stringBuilder.append(this.delete_table);
+        stringBuilder.append(delete_table);
         return stringBuilder.toString();
     }
 
-    public String getUrlRemovePosition(String login, String code)
+    public String getUrlCompletedStitched(String name_table, String date, String stitched, String id)
     {
-        return url_php_position + action_remove + this.login + login + this.code + code;
+        return url_php_position + action_insert_stitched + this.name_table + name_table + this.date + date + this.stitched + stitched + this.id + id;
+    }
+
+    public String getUrlComment (String name_table, String comment_manager, String comment_performer, String id)
+    {
+        return url_php_position + action_insert_comment + this.name_table + name_table + this.id + id +
+                this.comment_manager + comment_manager + this.comment_performer + comment_performer;
+    }
+
+    private String comment_manager = "&comment_manager=";
+    private String comment_performer = "&comment_performer=";
+    private String action_insert_comment = "action=insert_comment";
+    private String date = "&date=";
+    private String id = "&id=";
+    private String stitched = "&stitched=";
+    private String action_insert_stitched = "action=insert_stitched";
+    private String name_table = "&name_table=";
+
+    public String getUrlRemovePosition(String login, String code, String name_table)
+    {
+        return url_php_position + action_remove + this.login + login + this.code + code + this.name_table + name_table;
+    }
+
+    public String getUrlTablePosition(String name_table)
+    {
+        return url_php_position + action_select + this.name_table + name_table;
     }
 
     private String url_php_linking = "http://technicalplan.ho.ua/linking.php?";
@@ -226,7 +245,7 @@ public class ConstantUrl
     private String state = "&state=";
     private String action_linked = "action=linked";
 
-    public String getUrlSetLinking(String where, String from, String enterprise, String position, String code) throws Exception
+    public String getUrlSetLinking(String where, String from, String enterprise, String position, String code, String name_table) throws Exception
     {
         StringBuilder stringBuilder = new StringBuilder(url_php_linking);
         stringBuilder.append(action_insert);
@@ -240,6 +259,8 @@ public class ConstantUrl
         stringBuilder.append(URLEncoder.encode(position, "UTF-8"));
         stringBuilder.append(this.code);
         stringBuilder.append(URLEncoder.encode(code, "UTF-8"));
+        stringBuilder.append(this.name_table);
+        stringBuilder.append(URLEncoder.encode(name_table, "UTF-8"));
         return stringBuilder.toString();
     }
 
@@ -253,9 +274,9 @@ public class ConstantUrl
         return url_php_linking + action_select + from_user + login;
     }
 
-    public String getUrlSetLinkingState(String where, String from, String linked)
+    public String getUrlSetLinkingState(String where, String from, String linked, String name_table)
     {
-        return url_php_linking + action_linked + where_user + where + from_user + from + state + linked;
+        return url_php_linking + action_linked + where_user + where + from_user + from + state + linked + this.name_table + name_table;
     }
 
     public String getUrlRemoveLinkingFrom(String where, String from)
@@ -264,11 +285,30 @@ public class ConstantUrl
     }
 
     private String DOWNLOAN_CSV_URL = "http://technicalplan.ho.ua/csv/";
+    private String DOWNLOAN_CSV_URL_CREATED = "http://technicalplan.ho.ua/position.php?";
 
     public String getUrlDownloadCsv(String name) throws Exception
     {
         StringBuilder stringBuilder = new StringBuilder(DOWNLOAN_CSV_URL);
         stringBuilder.append(URLEncoder.encode(name, "UTF-8"));
+        return stringBuilder.toString();
+    }
+
+    private String action_download = "action=download";
+    private String name_position = "&name_position=";
+
+    private String comment_state = "&comment_state=";
+
+    public String getUrlDownloadCsvCreated(String name_table, String name_position, boolean comment_state) throws Exception
+    {
+        StringBuilder stringBuilder = new StringBuilder(DOWNLOAN_CSV_URL_CREATED);
+        stringBuilder.append(action_download);
+        stringBuilder.append(this.name_table);
+        stringBuilder.append(URLEncoder.encode(name_table, "UTF-8"));
+        stringBuilder.append(this.name_position);
+        stringBuilder.append(URLEncoder.encode(name_position, "UTF-8"));
+        stringBuilder.append(this.comment_state);
+        stringBuilder.append(comment_state);
         return stringBuilder.toString();
     }
 }

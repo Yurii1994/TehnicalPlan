@@ -1,6 +1,7 @@
 package com.muv.technicalplan.profile;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -15,8 +16,11 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
+import com.muv.technicalplan.base.BaseLinking;
+import com.muv.technicalplan.base.BaseMap;
 import com.muv.technicalplan.base.BaseUser;
 import com.muv.technicalplan.ConstantUrl;
+import com.muv.technicalplan.base.BaseUsers;
 import com.muv.technicalplan.data.DataUser;
 import com.muv.technicalplan.JsonParser;
 import com.muv.technicalplan.main.MainActivity;
@@ -34,6 +38,7 @@ public class DialogFragmentDeleteAccount extends DialogFragment implements View.
     private EditText codeView;
     private String code = "";
     private DialogFragmentDeleteAccount deleteAccount;
+    private final String UPDATE = "com.muv.action.UPDATE";
 
     public static DialogFragmentDeleteAccount newInstance(ProfileActivity activity){
         DialogFragmentDeleteAccount dialogFragment = new DialogFragmentDeleteAccount();
@@ -41,6 +46,14 @@ public class DialogFragmentDeleteAccount extends DialogFragment implements View.
         dialogFragment.setArguments(bundle);
         dialogFragment.setActivity(activity);
         return dialogFragment;
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString("Code", code);
+        outState.putString("Code_edit", codeView.getText().toString());
     }
 
     public void setDialog(DialogFragmentDeleteAccount dialog)
@@ -62,6 +75,12 @@ public class DialogFragmentDeleteAccount extends DialogFragment implements View.
         codeView = (EditText)layout.findViewById(R.id.delete_code);
         send_code.setOnClickListener(this);
 
+        if (savedInstanceState != null)
+        {
+            code = savedInstanceState.getString("Code");
+            codeView.setText(savedInstanceState.getString("Code_edit"));
+        }
+
         return new MaterialDialog.Builder(getActivity())
                 .customView(layout, false)
                 .positiveText(R.string.cancel)
@@ -72,7 +91,7 @@ public class DialogFragmentDeleteAccount extends DialogFragment implements View.
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        deleteAccount.dismiss();
+                        dismiss();
                     }
                 })
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -88,8 +107,34 @@ public class DialogFragmentDeleteAccount extends DialogFragment implements View.
                                     MainActivity.setDrawerLockClosed(MainActivity.drawerLayout);
                                     activity.deleteAccount();
                                     activity.setState_back(true);
-                                    BaseUser baseUser = new BaseUser();
-                                    baseUser.deleteBase();
+                                    Intent intent = new Intent(UPDATE);
+                                    intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                                    intent.putExtra("Update", "account");
+                                    intent.putExtra("Full_update", "true");
+                                    intent.putExtra("change", "true");
+                                    getActivity().sendBroadcast(intent);
+                                    try
+                                    {
+                                        Runnable runnable = new Runnable()
+                                        {
+                                            public void run() {
+
+                                                BaseUser baseUser = new BaseUser();
+                                                baseUser.deleteBase();
+                                                BaseMap baseMap = new BaseMap();
+                                                baseMap.deleteBase();
+                                                BaseLinking baseLinking = new BaseLinking();
+                                                baseLinking.deleteBase();
+                                                BaseUsers baseUsers = new BaseUsers();
+                                                baseUsers.deleteBase();
+                                            }
+                                        };
+                                        Thread thread = new Thread(runnable);
+                                        thread.start();
+                                    }
+                                    catch (Exception e)
+                                    {}
+
                                     SaveLoadPreferences saveLoadPreferences = new SaveLoadPreferences();
                                     saveLoadPreferences.saveBooleanPreferences("SING_IN", "CHANGE_PROFILE", true, getContext());
                                     PicassoTools.clearCache(Picasso.with(getContext()));

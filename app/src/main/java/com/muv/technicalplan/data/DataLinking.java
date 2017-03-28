@@ -10,11 +10,12 @@ public class DataLinking extends SugarRecord
     private String position;
     private String code;
     private String state;
+    private String name_table;
 
     public DataLinking() {
     }
 
-    public DataLinking(String where_user, String from_user, String enterprise, String position, String code, String state)
+    public DataLinking(String where_user, String from_user, String enterprise, String position, String code, String state, String name_table)
     {
         this.where_user = where_user;
         this.from_user = from_user;
@@ -22,6 +23,15 @@ public class DataLinking extends SugarRecord
         this.position = position;
         this.code = code;
         this.state = state;
+        this.name_table = name_table;
+    }
+
+    public String getName_table() {
+        return name_table;
+    }
+
+    public void setName_table(String name_table) {
+        this.name_table = name_table;
     }
 
     public String getWhere_user() {

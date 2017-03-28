@@ -107,6 +107,7 @@
                         android:layout_gravity="center">
 
                         <RadioButton
+                            android:id="@+id/registration_button_manager"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="@string/manager"
@@ -117,6 +118,7 @@
                             android:layout_marginRight="20dp"/>
 
                         <RadioButton
+                            android:id="@+id/registration_button_performer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="@string/performer"

@@ -19,16 +19,51 @@ public class CircleImage {
     {
         try {
 
-            int size = Math.min(source.getWidth(), source.getHeight());
+            int width = source.getWidth();
+            int height = source.getHeight();
 
-            int x = (source.getWidth() - size) / 2;
-            int y = (source.getHeight() - size) / 2;
+            int resizeWidth = 0;
+            int resizeHeight = 0;
+
+            if (width > 1000 || height > 1000)
+            {
+                int count = 0;
+                while (true)
+                {
+                    if (count > 0)
+                    {
+                        resizeWidth = resizeWidth / 2;
+                        resizeHeight = resizeHeight / 2;
+                    }
+                    else
+                    {
+                        resizeWidth = width / 2;
+                        resizeHeight = height / 2;
+                    }
+                    count++;
+                    if (resizeWidth < 1000 & resizeHeight < 1000)
+                    {
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                resizeWidth = width;
+                resizeHeight = height;
+            }
+
+            Bitmap resizeBm = Bitmap.createScaledBitmap(source, resizeWidth,
+                    resizeHeight, false);
+
+            int size = Math.min(resizeBm.getWidth(), resizeBm.getHeight());
+
+            int x = (resizeBm.getWidth() - size) / 2;
+            int y = (resizeBm.getHeight() - size) / 2;
 
             Bitmap squaredBitmap = Bitmap
-                    .createBitmap(source, x, y, size, size);
-            if (squaredBitmap != source) {
-                // source.recycle();
-            }
+                    .createBitmap(resizeBm, x, y, size, size);
+
             Bitmap bitmap = Bitmap.createBitmap(size, size,
                     squaredBitmap.getConfig());
 
@@ -41,14 +76,13 @@ public class CircleImage {
 
             float r = size / 2f;
             canvas.drawCircle(r, r, r, paint);
-            // canvas.drawArc(rectf, -90, 360, false, lightRed);
-            // squaredBitmap.recycle();
+
             return bitmap;
-        } catch (Exception e) {
-            // TODO: handle exception
         }
-        return BitmapFactory.decodeResource(context.getResources(),
-                R.drawable.profile_img);
+        catch (Exception e)
+        {
+            return BitmapFactory.decodeResource(context.getResources(), R.drawable.profile_img);
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.muv.technicalplan.AbstractTabFragment;
+import com.muv.technicalplan.data.DataMaps;
 import com.muv.technicalplan.data.DataSearch;
 
 import java.util.HashMap;
@@ -68,7 +69,7 @@ public class TabsPagerFragmentAdapterLinking extends FragmentPagerAdapter
 
     private void initTabMap(Context context) {
         tabs = new HashMap<>();
-        fragmentLinking = FragmentLinking.getInstance(context, activity);
+        fragmentLinking = FragmentLinking.getInstance(context);
         fragmentSearch = FragmentSearch.getInstance(context, activity);
         tabs.put(0, fragmentLinking);
         tabs.put(1, fragmentSearch);

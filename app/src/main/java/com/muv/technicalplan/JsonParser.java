@@ -2,6 +2,7 @@ package com.muv.technicalplan;
 
 
 import com.muv.technicalplan.data.DataLinking;
+import com.muv.technicalplan.data.DataMaps;
 import com.muv.technicalplan.data.DataPosition;
 import com.muv.technicalplan.data.DataSearch;
 import com.muv.technicalplan.data.DataUser;
@@ -263,10 +264,12 @@ public class JsonParser
                 String login = object.getString("login");
                 String position = object.getString("position");
                 String code = object.getString("code");
+                String name_table = object.getString("name_table");
 
                 data.setLogin(login);
                 data.setPosition(position);
                 data.setCode(code);
+                data.setName_table(name_table);
                 list.add(data);
             }
         }
@@ -321,6 +324,7 @@ public class JsonParser
                 String position = object.getString("position");
                 String code = object.getString("code");
                 String state = object.getString("state");
+                String name_table = object.getString("name_table");
 
                 data.setWhere_user(where_user);
                 data.setFrom_user(from_user);
@@ -328,6 +332,7 @@ public class JsonParser
                 data.setPosition(position);
                 data.setCode(code);
                 data.setState(state);
+                data.setName_table(name_table);
                 list.add(data);
             }
         }
@@ -335,6 +340,81 @@ public class JsonParser
     }
 
     public boolean getUpdateEnterprise(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+
+    public List<DataMaps> parseMaps(String dateUrl, String position, String name_table) throws Exception
+    {
+
+        List<DataMaps> list = new ArrayList<>();
+
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("GET");
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        resultJson = resultJson.replace("true[", "[");
+        if (!resultJson.equals("false"))
+        {
+            JSONArray jsonObj = new JSONArray(resultJson);
+
+            for (int i = 0; i < jsonObj.length(); i++)
+            {
+                DataMaps data = new DataMaps();
+                JSONObject object = jsonObj.getJSONObject(i);
+                int id = Integer.parseInt(object.getString("id"));
+                String code = object.getString("code");
+                String general = object.getString("general");
+                String relative = object.getString("relative");
+                String description = object.getString("description");
+                String normal = object.getString("normal");
+                String lightweight = object.getString("lightweight");
+                String light = object.getString("light");
+                String date = object.getString("date");
+                String comment_manager = object.getString("comment_manager");
+                String comment_performer = object.getString("comment_performer");
+                String stitched = object.getString("stitched");
+
+                data.setIdMap(id);
+                data.setCode(code);
+                data.setGeneral(general);
+                data.setRelative(relative);
+                data.setDescription(description);
+                data.setNormal(normal);
+                data.setLightweight(lightweight);
+                data.setLight(light);
+                data.setDate(date);
+                data.setComment_manager(comment_manager);
+                data.setComment_performer(comment_performer);
+                data.setPosition(position);
+                data.setName_table(name_table);
+                data.setStitched(stitched);
+                list.add(data);
+            }
+        }
+        return list;
+    }
+
+    public boolean getCompletedStitchedComment(String dateUrl) throws Exception
     {
         URL url = new URL(dateUrl);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

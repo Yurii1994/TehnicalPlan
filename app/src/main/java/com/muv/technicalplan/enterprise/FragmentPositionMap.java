@@ -19,8 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
+import com.esafirm.rxdownloader.RxDownloader;
 import com.muv.technicalplan.CircleImage;
+import com.muv.technicalplan.ConstantUrl;
 import com.muv.technicalplan.DialogFragmentProgress;
 import com.muv.technicalplan.R;
 import com.muv.technicalplan.data.DataMap;
@@ -30,9 +33,12 @@ import com.muv.technicalplan.profile.DialogFragmentDeleteAccount;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import rx.android.schedulers.AndroidSchedulers;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -49,6 +55,7 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
     private String code;
     private String TAG;
     private String positionOld;
+    private String name_table;
 
     public String getPositionOld() {
         return positionOld;
@@ -72,8 +79,16 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         this.path = path;
     }
 
+    public void setName_table(String name_table) {
+        this.name_table = name_table;
+    }
+
+    public String getName_table() {
+        return name_table;
+    }
+
     public static FragmentPositionMap newInstance(Context context, FragmentSettings fragmentSettings,
-                                                  String TAG, String position, String path, String code)
+                                                  String TAG, String position, String path, String code, String name_table)
     {
         Bundle args = new Bundle();
         FragmentPositionMap fragment = new FragmentPositionMap();
@@ -84,10 +99,11 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         fragment.setPositionOld(position);
         fragment.setPath(path);
         fragment.setCode(code);
+        fragment.setName_table(name_table);
         return fragment;
     }
 
-    private void setCode(String code)
+    public void setCode(String code)
     {
         this.code = code;
     }
@@ -164,18 +180,28 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
                 else
                 {
                     DialogFragmentDeletePosition deletePosition = new DialogFragmentDeletePosition().newInstance(this);
+                    deletePosition.setCancelable(false);
                     deletePosition.show(getFragmentManager(), "dialogFragment");
                 }
                 break;
 
             case R.id.upload:
-                getCSVFile();
+                TAG_Upload_Download = "UPLOAD";
+                UploadDownloadCSVFile(TAG_Upload_Download, false);
                 break;
 
             case R.id.download_scv:
-
+                DialogFragmentDownload deletePosition = new DialogFragmentDownload().newInstance(this);
+                deletePosition.setCancelable(false);
+                deletePosition.show(getFragmentManager(), "dialogFragment");
                 break;
         }
+    }
+
+    public void DownloadScv(boolean state)
+    {
+        TAG_Upload_Download = "DOWNLOAD";
+        UploadDownloadCSVFile(TAG_Upload_Download, state);
     }
 
     public void deleteFragment()
@@ -188,6 +214,7 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         handler.post(new Runnable() {
             @Override
             public void run() {
+
                 fragmentSettings.update();
             }
         });
@@ -197,18 +224,49 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         dataMap.setCode(code);
         dataMap.setPath(path);
         dataMap.setTAG(TAG);
+        dataMap.setName_table(name_table);
+        fragmentSettings.getEnterpriseActivity().setUpdate(false);
         fragmentSettings.setDataMapsDelete(dataMap);
     }
 
-    private void getCSVFile()
+    private String TAG_Upload_Download;
+
+    private void UploadDownloadCSVFile(String TAG_Upload_Download, boolean comment)
     {
-        if (isStoragePermissionGranted())
+        if (name_table != null || TAG_Upload_Download.equals("UPLOAD"))
         {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("text/csv");
-            startActivityForResult(intent, 1);
+            if (isStoragePermissionGranted())
+            {
+                if (TAG_Upload_Download.equals("UPLOAD"))
+                {
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                    intent.addCategory(Intent.CATEGORY_OPENABLE);
+                    intent.setType("text/csv");
+                    startActivityForResult(intent, 1);
+                }
+                else
+                {
+                    ConstantUrl constantUrl = new ConstantUrl();
+                    String url = "";
+                    try
+                    {
+                        url = constantUrl.getUrlDownloadCsvCreated(name_table, position.getText().toString(), comment);
+                    }
+                    catch (Exception e)
+                    {}
+                    RxDownloader.getInstance(context)
+                            .download(url, "karta.csv", "text/csv")
+                            .subscribeOn(AndroidSchedulers.mainThread());
+                }
+            }
         }
+        else
+        {
+            Toast toast = Toast.makeText(getContext(), getResources().getText(R.string.not_created_csv),
+                    Toast.LENGTH_SHORT);
+            toast.show();
+        }
+
     }
 
     @Override
@@ -221,11 +279,27 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         super.onActivityResult(requestCode, resultCode, intent);
         switch(requestCode) {
             case 1:
-                if(resultCode == RESULT_OK){
+                if(resultCode == RESULT_OK)
+                {
                     Uri selected = intent.getData();
                     path = selected.getPath();
+                    File file = new File(path);
+                    if (!getFileExtension(file).equals("csv"))
+                    {
+                        path = "";
+                        Toast toast = Toast.makeText(getContext(), getResources().getText(R.string.not_file_csv),
+                                Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                 }
         }
+    }
+
+    private static String getFileExtension(File file) {
+        String fileName = file.getName();
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        else return "";
     }
 
     @Override
@@ -235,7 +309,7 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         {
             if(grantResults[0]== PackageManager.PERMISSION_GRANTED)
             {
-                getCSVFile();
+                UploadDownloadCSVFile(TAG_Upload_Download, false);
             }
         }
     }
