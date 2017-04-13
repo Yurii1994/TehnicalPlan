@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,16 +54,41 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
     private int count_created;
     private List<DataMap> dataMapsDelete = new ArrayList<>();
     private EnterpriseActivity activity;
+    private ArrayList<DeleteMapParcelable> deleteMapParcelables = new ArrayList<>();
 
-    public List<DataMap> getDataMapsDelete() {
+    public RelativeLayout getProgress() {
+        return progress;
+    }
+
+    public TextView getHintView() {
+        return hint;
+    }
+
+    public List<DataMap> getDataMapsDelete()
+    {
+        List<DataMap> dataMapsDelete = new ArrayList<>();
+        for (int i = 0; i < deleteMapParcelables.size(); i++)
+        {
+            DataMap dataMap = new DataMap();
+            dataMap.setEnterprise(deleteMapParcelables.get(i).enterprise);
+            dataMap.setPosition(deleteMapParcelables.get(i).position);
+            dataMap.setPath(deleteMapParcelables.get(i).path);
+            dataMap.setTAG(deleteMapParcelables.get(i).TAG);
+            dataMap.setCode(deleteMapParcelables.get(i).code);
+            dataMap.setName_table(deleteMapParcelables.get(i).name_table);
+            dataMapsDelete.add(dataMap);
+        }
         return dataMapsDelete;
     }
 
-    public void setDataMapsDelete(DataMap dataMaps) {
-        this.dataMapsDelete.add(dataMaps);
+    public void setDataMapsDelete(DataMap dataMaps)
+    {
+        deleteMapParcelables.add(new DeleteMapParcelable(dataMaps.getEnterprise(), dataMaps.getPosition(),dataMaps.getPath(),
+                dataMaps.getTAG(), dataMaps.getCode(), dataMaps.getName_table()));
     }
 
-    public void setDataMapsDelete(List<DataMap> dataMapsDelete) {
+    public void setDataMapsDelete(List<DataMap> dataMapsDelete)
+    {
         this.dataMapsDelete = dataMapsDelete;
     }
 
@@ -70,14 +96,24 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         return count_created;
     }
 
-    public static FragmentSettings getInstance(Context context, String title, EnterpriseActivity activity)
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putInt("Count_created", count_created);
+        outState.putString("Enterprise", enterprise.getText().toString());
+        outState.putParcelableArrayList("DeleteMap", deleteMapParcelables);
+        outState.putString("Download_name", download_name);
+    }
+
+    public static FragmentSettings getInstance(Context context, String title)
     {
         Bundle args = new Bundle();
         FragmentSettings fragment = new FragmentSettings();
         fragment.setArguments(args);
         fragment.setContext(context);
         fragment.setTitle(title);
-        fragment.setEnterpriseActivity(activity);
         return fragment;
     }
 
@@ -85,14 +121,12 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         return activity;
     }
 
-    public void setEnterpriseActivity(EnterpriseActivity activity) {
-        this.activity = activity;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
+        activity = (EnterpriseActivity) getActivity();
         fragmentSettings = this;
         add = (Button)view.findViewById(R.id.add_position);
         add.setOnClickListener(this);
@@ -103,18 +137,54 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         enterprise = (EditText)view.findViewById(R.id.enterprise_name);
         progress = (RelativeLayout)view.findViewById(R.id.progress_position_enterprise);
         hint = (TextView)view.findViewById(R.id.position_hint_enterprise);
-        ConstantUrl constantUrl = new ConstantUrl();
-        String url = constantUrl.getUrlGetPosition(user.get(0).getLogin());
-        Position position = new Position(url, progress, hint);
-        position.execute();
+        if (savedInstanceState != null & getFragmentMap().size() > 0)
+        {
+            progress.setVisibility(View.GONE);
+        }
+        else
+        {
+            updateFragment(progress, hint);
+        }
         String enterpriseText = user.get(0).getEnterprise();
         if (enterpriseText.equals("false"))
         {
             enterpriseText = "";
         }
+        if (savedInstanceState != null)
+        {
+            count_created = savedInstanceState.getInt("Count_created");
+            enterpriseText = savedInstanceState.getString("Enterprise");
+            deleteMapParcelables = savedInstanceState.getParcelableArrayList("DeleteMap");
+            download_name = savedInstanceState.getString("Download_name");
+        }
         enterprise.setText(enterpriseText);
         getChangeKeyboard();
         return view;
+    }
+
+    public void updateFragment(View progress, TextView hint)
+    {
+        ConstantUrl constantUrl = new ConstantUrl();
+        String url = constantUrl.getUrlGetPosition(user.get(0).getLogin());
+        Position position = new Position(url, progress, hint);
+        position.execute();
+    }
+
+    private List<FragmentPositionMap> getFragmentMap()
+    {
+        List<Fragment> fragments = getFragmentManager().getFragments();
+        List<FragmentPositionMap> fragmentPositionsMap = new ArrayList<>();
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                FragmentPositionMap fragmentPositionMap = (FragmentPositionMap) fragments.get(i);
+                fragmentPositionsMap.add(fragmentPositionMap);
+            }
+            catch (Exception e)
+            {}
+        }
+        return fragmentPositionsMap;
     }
 
     private void getChangeKeyboard()
@@ -149,7 +219,7 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         {
             case R.id.add_position:
                 hint.setVisibility(View.GONE);
-                List<Fragment> fragments =  getRealFragments();
+                List<Fragment> fragments =  getRealFragments(getFragmentManager());
                 Fragment fragment = fragments.get(fragments.size() - 1);
                 try
                 {
@@ -256,9 +326,9 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
         return enterprise.getText().toString();
     }
 
-    public List<Fragment> getRealFragments()
+    public List<Fragment> getRealFragments(FragmentManager fragmentManager)
     {
-        List<Fragment> fragments = getFragmentManager().getFragments();
+        List<Fragment> fragments = fragmentManager.getFragments();
         List<Fragment> fragmentsReal = new ArrayList<>();
         for (int i = 0; i < fragments.size(); i++)
         {
@@ -278,11 +348,32 @@ public class FragmentSettings  extends AbstractTabFragment implements View.OnCli
 
         public Position(String url, View progress, TextView hint)
         {
+            List<Fragment> fragments = getFragmentManager().getFragments();
+            List<FragmentPositionMap> fragmentPositionsMap = new ArrayList<>();
+            for (int i = 0; i < fragments.size(); i++)
+            {
+                try
+                {
+                    FragmentPositionMap fragmentPositionMap = (FragmentPositionMap) fragments.get(i);
+                    fragmentPositionsMap.add(fragmentPositionMap);
+
+                }
+                catch (Exception e)
+                {}
+            }
+            transaction = getFragmentManager().beginTransaction();
+
+            for (int i = 0; i < fragmentPositionsMap.size(); i++)
+            {
+                transaction.remove(fragmentPositionsMap.get(i));
+                transaction.commitNow();
+            }
             this.url = url;
             this.progress = progress;
             this.hint = hint;
             progress.setVisibility(View.VISIBLE);
             hint.setVisibility(View.GONE);
+            count_created = 0;
         }
 
         @Override

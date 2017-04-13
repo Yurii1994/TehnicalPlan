@@ -27,8 +27,13 @@ public class BaseMap
             String name_table = dataMaps.get(i).getName_table();
             String state_performance = dataMaps.get(i).getState_performance();
             String stitched = dataMaps.get(i).getStitched();
+            String login = dataMaps.get(i).getLogin();
+            String name = dataMaps.get(i).getName();
+            String surname = dataMaps.get(i).getSurname();
+            String surname_father = dataMaps.get(i).getSurname_father();
             DataMaps base = new DataMaps(id, code, general, relative, description, normal,
-                    lightweight, light, date, comment_manager, comment_performer, position, name_table, state_performance, stitched);
+                    lightweight, light, date, comment_manager, comment_performer, position, name_table, state_performance, stitched,
+                    login, name, surname, surname_father);
             base.save();
         }
     }

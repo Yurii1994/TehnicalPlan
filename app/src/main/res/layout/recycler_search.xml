@@ -108,7 +108,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:spinnerMode="dialog"
-                    android:textColor="@color/colorWhite"
                     android:textSize="8pt"
                     android:layout_gravity="center"
                     style="@style/Widget.AppCompat.Spinner.Underlined"

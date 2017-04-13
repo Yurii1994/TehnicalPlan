@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/menu_refresh_enterprise"
+        android:title="@string/refresh"
+        android:icon="@mipmap/ic_refresh"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/menu_enterprise_save"
         android:title="@string/update_save"
         android:icon="@mipmap/ic_save_white_48dp"

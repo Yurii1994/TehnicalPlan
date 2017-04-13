@@ -28,6 +28,12 @@ if (isset($_GET["position"])) {
 if (isset($_GET["code"])) { 
     $code = $_GET['code'];
 }
+if (isset($_GET["name_table"])) { 
+    $name_table = $_GET['name_table'];
+}
+if (isset($_GET["state"])) { 
+    $state = $_GET['state'];
+}
 if (isset($_GET["state"])) { 
     $state = $_GET['state'];
 }
@@ -38,28 +44,37 @@ mysql_select_db($mysql_database);
 mysql_set_charset('utf8');
 header('Content-type: text/html; charset=utf-8');
 
-if($action == insert && $where_user != null && $from_user != null && $enterprise != null && $position != null)
+if($action == insert && $where_user != null && $from_user != null && $enterprise != null && $position != null && $name_table != null)
 {
 	$q=mysql_query("SELECT * FROM `linking` WHERE where_user='$from_user' AND from_user='$where_user'");	
 	while($e=mysql_fetch_assoc($q))
 	$list_whereAndFrom[]=$e;
 
-	if(count($list_whereAndFrom) == 0)
+	$q=mysql_query("SELECT * FROM `linking` WHERE where_user='$where_user' AND from_user='$from_user'");	
+	while($e=mysql_fetch_assoc($q))
+	$list_FromAndWhere[]=$e;
+
+	if(count($list_whereAndFrom) == 0 && count($list_FromAndWhere) == 0)
 	{
-		$q=mysql_query("SELECT * FROM `linking` WHERE from_user='$from_user'");	
+		$q=mysql_query("SELECT * FROM `linking` WHERE from_user='$from_user' AND where_user='$where_user'");	
 		while($e=mysql_fetch_assoc($q))
 		$list_from[]=$e;
-	
-		if(count($list_from) > 0)
+		
+		$q=mysql_query("SELECT * FROM `linking` WHERE from_user='$where_user' AND where_user='$from_user'");	
+		while($e=mysql_fetch_assoc($q))
+		$list_where[]=$e;
+		
+		if(count($list_from) > 0 || count($list_where) > 0)
 		{
-			mysql_query("UPDATE `linking` SET where_user='$where_user', enterprise='$enterprise', position='$position', code='$code' WHERE
+			mysql_query("UPDATE `linking` SET where_user='$where_user', enterprise='".mysql_real_escape_string($enterprise)."'
+			, position='".mysql_real_escape_string($position)."', code='$code', name_table='$name_table' WHERE
 			from_user='$from_user'");
 			print(json_encode(true));
 		}
 		else	
 		{
-			mysql_query("INSERT INTO `linking`(`where_user`,`from_user`,`enterprise`,`position`,`code`)
-			VALUES ('$where_user','$from_user', '$enterprise', '$position', '$code')");
+			mysql_query("INSERT INTO `linking`(`where_user`,`from_user`,`enterprise`,`position`,`code`,`name_table`)
+			VALUES ('$where_user','$from_user', '".mysql_real_escape_string($enterprise)."', '".mysql_real_escape_string($position)."', '$code', '$name_table')");
 			print(json_encode(true));
 		}
 	}
@@ -69,7 +84,7 @@ if($action == insert && $where_user != null && $from_user != null && $enterprise
 	}
 }
 
-if($action == linked && $where_user != null && $from_user != null && $state != null)
+if($action == linked && $where_user != null && $from_user != null && $state != null && $name_table != null)
 {
 	$q=mysql_query("SELECT * FROM `linking` WHERE where_user='$where_user' AND from_user='$from_user'");	
 	while($e=mysql_fetch_assoc($q))
@@ -104,11 +119,13 @@ if($action == linked && $where_user != null && $from_user != null && $state != n
 		
 			if($type_account_where == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='$enterprise',position='$position' WHERE login='$where_user'");
+				mysql_query("UPDATE `users` SET enterprise='".mysql_real_escape_string($enterprise)."',
+				position='".mysql_real_escape_string($position)."', name_table='$name_table' WHERE login='$where_user'");
 			}
 			if($type_account_from == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='$enterprise',position='$position' WHERE login='$from_user'");
+				mysql_query("UPDATE `users` SET enterprise='".mysql_real_escape_string($enterprise)."',
+				position='".mysql_real_escape_string($position)."' , name_table='$name_table' WHERE login='$from_user'");
 			}
 		}
 		else
@@ -130,11 +147,11 @@ if($action == linked && $where_user != null && $from_user != null && $state != n
 			
 			if($type_account_where == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='null',position='null' WHERE login='$where_user'");
+				mysql_query("UPDATE `users` SET enterprise='false',position='false', name_table='false' WHERE login='$where_user'");
 			}
 			if($type_account_from == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='null',position='null' WHERE login='$from_user'");
+				mysql_query("UPDATE `users` SET enterprise='false',position='false', name_table='false' WHERE login='$from_user'");
 			}
 		}
 		print(json_encode(true));
@@ -175,11 +192,11 @@ if($action == remove)
 			
 			if($type_account_where == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='null',position='null' WHERE login='$where_user'");
+				mysql_query("UPDATE `users` SET enterprise='false',position='false', name_table='false' WHERE login='$where_user'");
 			}
 			if($type_account_from == 2)
 			{
-				mysql_query("UPDATE `users` SET enterprise='null',position='null' WHERE login='$from_user'");
+				mysql_query("UPDATE `users` SET enterprise='false',position='false', name_table='false' WHERE login='$from_user'");
 			}
 			
 			print(json_encode(true));

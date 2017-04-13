@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import com.muv.technicalplan.AbstractTabFragment;
 import com.muv.technicalplan.data.DataMaps;
 import com.muv.technicalplan.data.DataSearch;
+import com.muv.technicalplan.profile.PageTwoProfileFragment;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,15 +16,13 @@ import java.util.Map;
 
 public class TabsPagerFragmentAdapterLinking extends FragmentPagerAdapter
 {
-    private LinkingActivity activity;
     private Map<Integer, AbstractTabFragment> tabs;
 
     private FragmentSearch fragmentSearch;
     private FragmentLinking fragmentLinking;
 
-    public TabsPagerFragmentAdapterLinking(Context context, FragmentManager fm, LinkingActivity activity) {
+    public TabsPagerFragmentAdapterLinking(Context context, FragmentManager fm) {
         super(fm);
-        this.activity = activity;
         initTabMap(context);
     }
 
@@ -37,31 +36,6 @@ public class TabsPagerFragmentAdapterLinking extends FragmentPagerAdapter
         return tabs.get(position).getTitle();
     }
 
-    public void getSearch(String query)
-    {
-        fragmentSearch.getSearch(query);
-    }
-
-    public void createActivityLinking()
-    {
-        fragmentLinking.createActivity();
-    }
-
-    public boolean getStateLinking()
-    {
-        return fragmentSearch.getStateLinking();
-    }
-
-    public void setStateLinking(boolean state)
-    {
-        fragmentSearch.setStateLinking(state);
-    }
-
-    public void setDataSearches(List<DataSearch> list)
-    {
-        fragmentSearch.setDataSearches(list);
-    }
-
     @Override
     public int getCount() {
         return tabs.size();
@@ -70,7 +44,7 @@ public class TabsPagerFragmentAdapterLinking extends FragmentPagerAdapter
     private void initTabMap(Context context) {
         tabs = new HashMap<>();
         fragmentLinking = FragmentLinking.getInstance(context);
-        fragmentSearch = FragmentSearch.getInstance(context, activity);
+        fragmentSearch = FragmentSearch.getInstance(context);
         tabs.put(0, fragmentLinking);
         tabs.put(1, fragmentSearch);
     }

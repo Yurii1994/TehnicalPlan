@@ -29,6 +29,9 @@ if (isset($_GET["enterprise"])) {
 if (isset($_GET["position"])) { 
     $position = $_GET['position'];
 }
+if (isset($_GET["name_table"])) { 
+    $name_table = $_GET['name_table'];
+}
 if (isset($_GET["login"])) { 
     $login = $_GET['login'];
 }
@@ -54,7 +57,7 @@ mysql_set_charset('utf8');
 header('Content-type: text/html; charset=utf-8');
 
 if($action == insert && $name != null && $surname != null
- && $surname_father != null && $login != null && $password != null && $email != null && $type_account != null)
+ && $surname_father != null && $login != null && $password != null && $email != null && $type_account != null && $name_table != null)
 {
 	$q=mysql_query("SELECT * FROM users WHERE email='$email'");	
 	while($e=mysql_fetch_assoc($q))
@@ -81,9 +84,11 @@ if($action == insert && $name != null && $surname != null
 					$type_account_old = $f[type_account];
 				}	
 				
-				mysql_query("UPDATE `users` SET name='$name', surname='$surname', surname_father='$surname_father'
-				,enterprise='$enterprise',position='$position',login='$new_login',password='$password',email='$email',type_account='$type_account'
+				mysql_query("UPDATE `users` SET name='".mysql_real_escape_string($name)."', surname='".mysql_real_escape_string($surname)."',
+				surname_father='".mysql_real_escape_string($surname_father)."' ,enterprise='".mysql_real_escape_string($enterprise)."',
+				position='".mysql_real_escape_string($position)."',name_table='$name_table' ,login='$new_login',password='$password',email='$email',type_account='$type_account'
 				WHERE login='$login'");
+				
 				print(json_encode(true));
 			
 				//Якщо тип акаунта не мінявся
@@ -94,8 +99,8 @@ if($action == insert && $name != null && $surname != null
 						//обновит логин в спеціальності
 						mysql_query("UPDATE `position` SET login='$new_login' WHERE login='$login'");
 						//обновит підпремство в привязкі і логін менеджера
-						mysql_query("UPDATE `linking` SET enterprise='$enterprise', where_user='$new_login' WHERE where_user='$login'");
-						mysql_query("UPDATE `linking` SET enterprise='$enterprise', from_user='$new_login' WHERE from_user='$login'");
+						mysql_query("UPDATE `linking` SET enterprise='".mysql_real_escape_string($enterprise)."', where_user='$new_login' WHERE where_user='$login'");
+						mysql_query("UPDATE `linking` SET enterprise='".mysql_real_escape_string($enterprise)."', from_user='$new_login' WHERE from_user='$login'");
 					}
 					else
 					{	
@@ -107,14 +112,26 @@ if($action == insert && $name != null && $surname != null
 				else
 				{
 					//видалить дані привязані до менеджера
-					if($type_account == 2)
+					
+					
+					//удаление специальностей и таблиц
+					if($type_account_old == 1)
 					{
-						//таблиця linking
-						mysql_query("DELETE FROM `linking` WHERE where_user='$login'");
-						mysql_query("DELETE FROM `linking` WHERE from_user='$login'");
-						//таблиця position
-						mysql_query("DELETE FROM `position` WHERE login='$login'");
+						$res = mysql_query("SELECT * FROM `position` WHERE login='$login'");
+						for ($c = 0; $c < mysql_num_rows($res); $c++)
+						{
+							$f = mysql_fetch_array($res);
+							$name_table = $f[name_table];
+							DeleteTable($mysql_host, $mysql_user, $mysql_password, $mysql_database, $name_table);
+						}
 					}
+					//таблиця linking
+					mysql_query("DELETE FROM `linking` WHERE where_user='$login'");
+					mysql_query("DELETE FROM `linking` WHERE from_user='$login'");
+					//таблиця position
+					mysql_query("DELETE FROM `position` WHERE login='$login'");
+						
+					mysql_query("UPDATE `users` SET enterprise='false', position='false', name_table = 'false' WHERE login='$new_login'");
 				}
 			}
 			else
@@ -125,8 +142,9 @@ if($action == insert && $name != null && $surname != null
 		else
 		{
 			mysql_query("INSERT INTO `users`(`name`,`surname`,`surname_father`,`enterprise`,
-			`position`,`login`,`password`,`email`,`type_account`) VALUES
-			('$name','$surname','$surname_father','$enterprise','$position','$login','$password','$email','$type_account')");
+			`position`,`name_table`,`login`,`password`,`email`,`type_account`) VALUES
+			('".mysql_real_escape_string($name)."','".mysql_real_escape_string($surname)."','".mysql_real_escape_string($surname_father)."',
+			'".mysql_real_escape_string($enterprise)."','".mysql_real_escape_string($position)."','$name_table','$login','$password','$email','$type_account')");
 			mail($email, "Регістрація виконана.", "Вітаємо $name, Ви зареєструвалися в системі. Дякуємо, що Ви обрали нас. \nДля входу викристовуйте: \nЛогін: $login \nПароль: $password");
 			print(json_encode(true));
 		}
@@ -144,7 +162,7 @@ if($action == insert && $name != null && $surname != null
 
 if($action == refresh && $login != null && $enterprise != null)
 {
-	mysql_query("UPDATE `users` SET enterprise='$enterprise' WHERE login='$login'") or die(print(json_encode(false)));
+	mysql_query("UPDATE `users` SET enterprise='".mysql_real_escape_string($enterprise)."' WHERE login='$login'") or die(print(json_encode(false)));
 	print(json_encode(true));
 }
 
@@ -157,9 +175,6 @@ if($action == remove)
 	}
 	else
 	{
-		//удаление пользователя
-		mysql_query("DELETE FROM `users` WHERE login='$login'");
-		
 		//удаление изображения пользователя
 		$res = mysql_query("SELECT * FROM `users` WHERE login='$login'");
 		while($e=mysql_fetch_assoc($res))
@@ -177,8 +192,33 @@ if($action == remove)
 			mysql_query("UPDATE `users` SET images='$new_name' WHERE login='$login'");
 		}
 		
+		//удаление специальностей и таблиц
+		$tabl = mysql_query("SELECT * FROM `position` WHERE login='$login'");
+		for ($c = 0; $c < mysql_num_rows($tabl); $c++)
+		{
+			$f = mysql_fetch_array($tabl);
+			$name_table = $f[name_table];
+			DeleteTable($mysql_host, $mysql_user, $mysql_password, $mysql_database, $name_table);
+		}
+		mysql_query("DELETE FROM `position` WHERE login='$login'");
+	
+		//удаление привязки
+		mysql_query("DELETE FROM `linking` WHERE where_user='$login'");	
+		mysql_query("DELETE FROM `linking` WHERE from_user='$login'");
+		
+		//удаление пользователя
+		mysql_query("DELETE FROM `users` WHERE login='$login'");
+		
 		print(json_encode(true));
 	}
+}
+
+function DeleteTable($mysql_host, $mysql_user, $mysql_password, $mysql_database, $name_table)
+{
+    $connection = mysqli_connect($mysql_host, $mysql_user, $mysql_password);
+	mysqli_select_db($connection, $mysql_database);
+	$sql ="DROP TABLE $name_table";
+	mysqli_query($connection, $sql); 
 }
 
 if($action == select)

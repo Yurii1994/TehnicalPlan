@@ -41,6 +41,8 @@ public class FragmentSearch extends AbstractTabFragment
     private List<DataUser> user = DataUser.listAll(DataUser.class);
     private int type_account = user.get(0).getType_account();
     private RecyclerViewMargin decoration;
+    private ArrayList<SearchParcelable> searchParcelables = new ArrayList<>();
+
 
     public boolean getStateLinking()
     {
@@ -52,26 +54,30 @@ public class FragmentSearch extends AbstractTabFragment
         adapter.setStateLinking(state);
     }
 
-    public static FragmentSearch getInstance(Context context, LinkingActivity activity)
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("SearchParcelable", searchParcelables);
+    }
+
+    public static FragmentSearch getInstance(Context context)
     {
         Bundle args = new Bundle();
         FragmentSearch fragment = new FragmentSearch();
         fragment.setArguments(args);
         fragment.setContext(context);
         fragment.setTitle(context.getString(R.string.search));
-        fragment.setLinkingActivity(activity);
         return fragment;
     }
 
-    private void setLinkingActivity(LinkingActivity activity)
-    {
-        this.activity = activity;
-    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(LAYOUT, container, false);
+        context = getContext();
+        activity = (LinkingActivity) getActivity();
 
         progressWheel = (ProgressWheel)view.findViewById(R.id.progress_search);
         hint = (TextView)view.findViewById(R.id.hint_search);
@@ -82,7 +88,40 @@ public class FragmentSearch extends AbstractTabFragment
         recyclerView.setAdapter(adapter);
         progressWheel.setVisibility(View.GONE);
 
+        if (savedInstanceState != null)
+        {
+            searchParcelables = savedInstanceState.getParcelableArrayList("SearchParcelable");
+            dataSearches = getDataSearch(searchParcelables);
+            adapter.setData(dataSearches);
+            adapter.notifyDataSetChanged();
+            progressWheel.setVisibility(View.GONE);
+            hint.setVisibility(View.GONE);
+            recyclerView.removeItemDecoration(decoration);
+            decoration = new RecyclerViewMargin(pxFromDp(10), dataSearches.size());
+            recyclerView.addItemDecoration(decoration);
+            recyclerView.setVisibility(View.VISIBLE);
+            activity.searchViewClearFocus();
+        }
+
         return view;
+    }
+
+    private List<DataSearch> getDataSearch(ArrayList<SearchParcelable> searchParcelables)
+    {
+        List<DataSearch> dataSearches = new ArrayList<>();
+        for (int i = 0; i < searchParcelables.size(); i++)
+        {
+            DataSearch dataSearch = new DataSearch();
+            dataSearch.setName(searchParcelables.get(i).name);
+            dataSearch.setSurname(searchParcelables.get(i).surname);
+            dataSearch.setSurname_father(searchParcelables.get(i).surname_father);
+            dataSearch.setEnterprise(searchParcelables.get(i).enterprise);
+            dataSearch.setLogin(searchParcelables.get(i).login);
+            dataSearch.setImage(searchParcelables.get(i).image);
+            dataSearches.add(dataSearch);
+
+        }
+        return dataSearches;
     }
 
     private int pxFromDp(float dp)
@@ -283,6 +322,17 @@ public class FragmentSearch extends AbstractTabFragment
             }
             else
             {
+                searchParcelables = new ArrayList<>();
+                for (int i = 0; i < dataSearches.size(); i++)
+                {
+                    String name = dataSearches.get(i).getName();
+                    String surname = dataSearches.get(i).getSurname();
+                    String surname_father = dataSearches.get(i).getSurname_father();
+                    String login = dataSearches.get(i).getLogin();
+                    String enterprise = dataSearches.get(i).getEnterprise();
+                    String image = dataSearches.get(i).getImage();
+                    searchParcelables.add(new SearchParcelable(name, surname, surname_father, login, enterprise, image));
+                }
                 adapter.setData(dataSearches);
                 adapter.notifyDataSetChanged();
                 progressWheel.setVisibility(View.GONE);
@@ -297,6 +347,17 @@ public class FragmentSearch extends AbstractTabFragment
 
     public void setDataSearches(List<DataSearch> list)
     {
+        searchParcelables = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++)
+        {
+            String name = list.get(i).getName();
+            String surname = list.get(i).getSurname();
+            String surname_father = list.get(i).getSurname_father();
+            String login = list.get(i).getLogin();
+            String enterprise = list.get(i).getEnterprise();
+            String image = list.get(i).getImage();
+            searchParcelables.add(new SearchParcelable(name, surname, surname_father, login, enterprise, image));
+        }
         recyclerView.removeAllViews();
         recyclerView.removeItemDecoration(decoration);
         decoration = new RecyclerViewMargin(pxFromDp(10), dataSearches.size());

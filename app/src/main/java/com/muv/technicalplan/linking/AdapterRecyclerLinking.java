@@ -268,6 +268,7 @@ public class AdapterRecyclerLinking extends RecyclerView.Adapter<AdapterRecycler
                     Intent intent = new Intent(UPDATE);
                     intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
                     intent.putExtra("Update", "account");
+                    intent.putExtra("Full_update", "true");
                     intent.putExtra("change", "true");
                     context.sendBroadcast(intent);
                 }

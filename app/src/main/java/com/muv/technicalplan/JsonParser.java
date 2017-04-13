@@ -12,8 +12,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -393,6 +395,10 @@ public class JsonParser
                 String comment_manager = object.getString("comment_manager");
                 String comment_performer = object.getString("comment_performer");
                 String stitched = object.getString("stitched");
+                String login = object.getString("login");
+                String name = object.getString("name");
+                String surname = object.getString("surname");
+                String surname_father = object.getString("surname_father");
 
                 data.setIdMap(id);
                 data.setCode(code);
@@ -408,6 +414,10 @@ public class JsonParser
                 data.setPosition(position);
                 data.setName_table(name_table);
                 data.setStitched(stitched);
+                data.setLogin(login);
+                data.setName(name);
+                data.setSurname(surname);
+                data.setSurname_father(surname_father);
                 list.add(data);
             }
         }
@@ -415,6 +425,60 @@ public class JsonParser
     }
 
     public boolean getCompletedStitchedComment(String dateUrl) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.connect();
+        InputStream inputStream = urlConnection.getInputStream();
+        StringBuilder buffer = new StringBuilder();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            buffer.append(line);
+        }
+        String resultJson = buffer.toString();
+        return Boolean.valueOf(resultJson);
+    }
+
+    public String getCreateReport(String dateUrl, String params) throws Exception
+    {
+        URL url = new URL(dateUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestMethod("POST");
+        urlConnection.setDoOutput(true);
+        urlConnection.setDoInput(true);
+
+        urlConnection.setRequestProperty("Content-Length", "" + Integer.toString(params.getBytes().length));
+        OutputStream os = urlConnection.getOutputStream();
+
+        byte[] data = params.getBytes("UTF-8");
+
+        os.write(data);
+
+        urlConnection.connect();
+        int responseCode = urlConnection.getResponseCode();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        String resultString = "";
+        if (responseCode == 200)
+        {
+            InputStream inputStream = urlConnection.getInputStream();
+
+            byte[] buffer = new byte[8192];
+
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1)
+            {
+                baos.write(buffer, 0, bytesRead);
+            }
+            data = baos.toByteArray();
+            resultString = new String(data, "UTF-8");
+        }
+        return resultString.replace("\"", "");
+    }
+
+    public boolean getDeleteReport(String dateUrl) throws Exception
     {
         URL url = new URL(dateUrl);
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();

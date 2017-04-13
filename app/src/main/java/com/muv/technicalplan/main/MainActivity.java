@@ -87,8 +87,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
     private EditText login;
     private EditText password;
     private CheckBox save_account;
-    private boolean state_save_account;
-    private boolean changed_profile;
+    private boolean state_save_account = false;
+    private boolean changed_profile = false;
     private LinearLayout sing_in_layout;
     private LinearLayout main_layout;
     private JsonParser jsonParser = new JsonParser();
@@ -122,6 +122,7 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
     private boolean account_update;
     private int count_start;
     private DialogFragmentProgress dialog;
+    private boolean reg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -184,7 +185,7 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
         {
             state_save_account = saveLoadPreferences.loadBooleanPreferences("SING_IN", "SAVE_ACCOUNT", this);
             save_account.setChecked(state_save_account);
-            if (!state_save_account & !changed_profile)
+            if (!state_save_account & !changed_profile & !reg)
             {
                 BaseUser baseUser = new BaseUser();
                 baseUser.deleteBase();
@@ -197,6 +198,7 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
             }
             else
             {
+                reg = false;
                 if (internet.isOnline(this))
                 {
                     String login = user.get(0).getLogin();
@@ -296,6 +298,7 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
                                 if (registration.equals("true"))
                                 {
                                     account_update = false;
+                                    reg = true;
                                 }
                             }
                             changed_profile = false;
@@ -620,7 +623,7 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
 
         public SingIn(String url_login, String url_email, String password)
         {
-            dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.sing));
+
             this.url_login = url_login;
             this.url_email = url_email;
             this.password = password;
@@ -632,8 +635,14 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
             {
                 if (!changed_profile)
                 {
-                    dialog.show(getFragmentManager(), "dialogFragment");
-                    dialog.setCancelable(false);
+                    try
+                    {
+                        dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.sing));
+                        dialog.show(getFragmentManager(), "dialogFragment");
+                        dialog.setCancelable(false);
+                    }
+                    catch (Exception e)
+                    {}
                 }
                 dataUserLogin = jsonParser.parseUser(url_login);
                 dataUserEmail = jsonParser.parseUser(url_email);
@@ -1767,6 +1776,10 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
                 String comment_performer = dataMap.get(i).getComment_performer();
                 String position = dataMap.get(i).getPosition();
                 String name_table = dataMap.get(i).getName_table();
+                String login = dataMap.get(i).getLogin();
+                String name = dataMap.get(i).getName();
+                String surname = dataMap.get(i).getSurname();
+                String surname_father = dataMap.get(i).getSurname_father();
 
                 if (dateMap.length() == 0)
                 {
@@ -1787,7 +1800,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
 
                     String state_performance = dateNew + " (" + getResources().getText(R.string.today) + ")";
                     dataRez.add(setDataMap(id, code, general, relative, description, normal, lightweight, light,
-                            dateOld, comment_manager, comment_performer, position, name_table, state_performance, "[true]"));//виконати сьогодні
+                            dateOld, comment_manager, comment_performer, position, name_table, state_performance, "[true]",
+                            login, name, surname, surname_father));//виконати сьогодні
                 }
                 else
                 {
@@ -1844,7 +1858,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
                                     + getResources().getText(R.string.days)+ ")";
 
                             dataRez.add(setDataMap(id, code, general, relative, description, normal, lightweight, light,
-                                    dateOld, comment_manager, comment_performer, position, name_table, state_performance, day_stitched + "[true]")); //не винонано
+                                    dateOld, comment_manager, comment_performer, position, name_table, state_performance, day_stitched + "[true]",
+                                    login, name, surname, surname_father)); //не винонано
                         }
                         else
                         if (state_map == 0)
@@ -1852,7 +1867,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
                             String state_performance = dateNew + " (" + getResources().getText(R.string.today) + ")";
 
                             dataRez.add(setDataMap(id, code, general, relative, description, normal, lightweight, light,
-                                    dateOld, comment_manager, comment_performer, position, name_table, state_performance, "[true]"));//виконати сьогодні
+                                    dateOld, comment_manager, comment_performer, position, name_table, state_performance, "[true]",
+                                    login, name, surname, surname_father));//виконати сьогодні
                         }
                         else
                         if (state_map == 1)
@@ -1863,7 +1879,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
                                 if (state_map_plus == -1 || state_map_plus == 0 || state_full)
                                 {
                                     dataRez.add(setDataMap(id, code, general, relative, description, normal, lightweight, light,
-                                            dateOld, comment_manager, comment_performer, position, name_table, dateNew, "[false]"));//виконати пізніше на day днів
+                                            dateOld, comment_manager, comment_performer, position, name_table, dateNew, "[false]",
+                                            login, name, surname, surname_father));//виконати пізніше на day днів
                                 }
                             }
                         }
@@ -1880,7 +1897,8 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
 
     private DataMaps setDataMap(int id, String code, String general, String relative, String description, String normal,
     String lightweight, String light, String dateOld, String comment_manager,String comment_prerformer , String position, String name_table,
-                                String state_performance, String stitched)
+                                String state_performance, String stitched, String login, String name, String surname,
+                                String surname_father)
     {
         DataMaps dataMapReal = new DataMaps();
 
@@ -1899,6 +1917,10 @@ public class MainActivity  extends AppCompatActivity implements View.OnClickList
         dataMapReal.setName_table(name_table);
         dataMapReal.setState_performance(state_performance);
         dataMapReal.setStitched(stitched);
+        dataMapReal.setLogin(login);
+        dataMapReal.setName(name);
+        dataMapReal.setSurname(surname);
+        dataMapReal.setSurname_father(surname_father);
         return dataMapReal;
     }
 

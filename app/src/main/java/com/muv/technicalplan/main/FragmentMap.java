@@ -143,7 +143,7 @@ public class FragmentMap  extends AbstractTabFragment
             {
                 if (internet.isOnline(getContext()))
                 {
-                    if (user.get(0).getEnterprise().equals("false"))
+                    if (user.get(0).getEnterprise().equals("false") || user.get(0).getPosition().equals("false"))
                     {
                         progressWheel.setVisibility(View.GONE);
                         if (user.get(0).getType_account() == 1)

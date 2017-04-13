@@ -94,7 +94,7 @@ function searchThreeOption($query_name_one, $query_name_two, $query_name_three, 
 				((`name` LIKE '%$query_name_one%' OR `name` LIKE '%$query_name_two%' OR `name` LIKE '%$query_name_three%')
 				AND (`surname` LIKE '%$query_name_one%' OR `surname` LIKE '%$query_name_two%' OR `surname` LIKE '%$query_name_three%')
 				AND (`surname_father` LIKE '%$query_name_one%' OR `surname_father` LIKE '%$query_name_two%' OR `surname_father` LIKE '%$query_name_three%'))
-				AND (`type_account` = '$type_account' AND `enterprise` != 'null')";
+				AND (`type_account` = '$type_account' AND `enterprise` != 'false')";
 				$result = mysql_query($res);   
 			}
 			else
@@ -103,7 +103,7 @@ function searchThreeOption($query_name_one, $query_name_two, $query_name_three, 
 				((`name` LIKE '%$query_name_one%' OR `name` LIKE '%$query_name_two%' OR `name` LIKE '%$query_name_three%')
 				AND (`surname` LIKE '%$query_name_one%' OR `surname` LIKE '%$query_name_two%' OR `surname` LIKE '%$query_name_three%')
 				AND (`surname_father` LIKE '%$query_name_one%' OR `surname_father` LIKE '%$query_name_two%' OR `surname_father` LIKE '%$query_name_three%'))
-				AND (`type_account` = '$type_account' AND `enterprise` = 'null')";
+				AND (`type_account` = '$type_account' AND `enterprise` = 'false')";
 				$result = mysql_query($res);   
 			}
             
@@ -149,7 +149,7 @@ function searchTwoOption($query_name_one, $query_name_two, $type_account)
 				OR((`surname` LIKE '%$query_name_one%' OR `surname` LIKE '%$query_name_two%')
 				AND (`surname_father` LIKE '%$query_name_one%' OR `surname_father` LIKE '%$query_name_two%')))
 			
-				AND (`type_account` = '$type_account' AND `enterprise` != 'null')";
+				AND (`type_account` = '$type_account' AND `enterprise` != 'false')";
 				$result = mysql_query($res);  
 			}
 			else
@@ -164,7 +164,7 @@ function searchTwoOption($query_name_one, $query_name_two, $type_account)
 				OR((`surname` LIKE '%$query_name_one%' OR `surname` LIKE '%$query_name_two%')
 				AND (`surname_father` LIKE '%$query_name_one%' OR `surname_father` LIKE '%$query_name_two%')))
 			
-				AND (`type_account` = '$type_account' AND `enterprise` = 'null')";
+				AND (`type_account` = '$type_account' AND `enterprise` = 'false')";
 				$result = mysql_query($res);   
 			}
             
@@ -198,14 +198,14 @@ function searchOneOption($query, $type_account)
 			if($type_account == 1)
 			{
 				$res = "SELECT `name`, `surname`, `surname_father`, `login`, `enterprise`, `images` FROM `users` WHERE (`name` LIKE '%$query%'
-				OR `surname` LIKE '%$query%' OR `surname_father` LIKE '%$query%') AND (`type_account` = '$type_account' AND `enterprise` != 'null')";
+				OR `surname` LIKE '%$query%' OR `surname_father` LIKE '%$query%') AND (`type_account` = '$type_account' AND `enterprise` != 'false')";
 				$result = mysql_query($res);  
 			}
 			else
 			{
 				$res = "SELECT `name`, `surname`, `surname_father`, `login`, `enterprise`, `images` FROM `users` WHERE (`name` LIKE '%$query%'
-				OR `surname` LIKE '%$query%' OR `surname_father` LIKE '%$query%') AND (`type_account` = '$type_account' AND `enterprise` = 'null')";
-				$result = mysql_query($res); 
+				OR `surname` LIKE '%$query%' OR `surname_father` LIKE '%$query%') AND (`type_account` = '$type_account' AND `enterprise` = 'false')";
+				$result = mysql_query($res);
 			}
 		} 
     }

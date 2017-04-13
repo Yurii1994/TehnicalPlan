@@ -142,20 +142,64 @@
     <string name="date_of_future">Дата наступного виконання:</string>
     <string name="not_known">не відомо</string>
     <string name="stitched">прострочено</string>
-    <string name="days">день(я)</string>
+    <string name="days">дня(-ень)</string>
     <string name="on_today">На сьогодні</string>
     <string name="on_three_days">На 3 дня вперед</string>
     <string name="on_seven_days">На 7 днів вперед</string>
     <string name="by_time">По часу</string>
     <string name="by_type">По типу</string>
     <string name="completed">Виконані</string>
-    <string name="all">Всі</string>
+    <string name="all">Усі</string>
     <string name="overdue">Прострочені</string>
     <string name="position_menu">По спеціальності</string>
     <string name="save_filter">Зберегти фільтр</string>
     <string name="comment_manager">Коментар менеджера</string>
     <string name="comment_performer">Коментар виконавця</string>
     <string name="save_comment">Зберегти коментар</string>
+    <string name="with">З</string>
+    <string name="by">по</string>
+    <string name="date_error">Вибрана дата, не повинна бути більшою за сьогоднішню</string>
+    <string name="period">Період:</string>
+    <string name="save_report">Зберегти звіт</string>
+    <string name="hint_report">Сформуйте та збережіть звіт</string>
+    <string name="comments">Коментар:</string>
+    <string name="other">Інше:</string>
+    <string name="without">Без</string>
+    <string name="managers">Менеджера</string>
+    <string name="performers">Виконавця</string>
+    <string name="specialty">Спеціальність:</string>
+    <string name="who_made">Ким виконано</string>
+    <string name="overall">Загальне:</string>
+    <string name="head">Керівник</string>
+    <string name="name_doc">І\'мя документа</string>
+    <string name="my_template">Мій шаблон</string>
+    <string name="not_file_docx">Файл повинен бути в форматі docx</string>
+    <string name="not_data">Немає даних</string>
+    <string name="head_initials_name_document">Введіть ініціали керівника та назву документа</string>
+    <string name="head_initials">Введіть ініціали керівника</string>
+    <string name="name_document">Введіть назву документа</string>
+    <string name="select_file">Вибрати файл</string>
+    <string name="upload_template">Завантаження шаблону</string>
+    <string name="comleted_template">Шаблон завантажено</string>
+
+
+    <string name="who_complete">виконав</string> //не переводить
+    <string name="regime">Режим роботи:</string>
+    <string name="not_complated">Не виконано:</string>
+    <string name="complated">Виконано:</string>
+    <string name="normal_regime">Нормальний</string>
+    <string name="lightweight_regime">Полегшений</string>
+    <string name="light_regime">Легкий</string>
+    <string name="code_report">Код</string>
+    <string name="date_completed">дата виконання</string>
+    <string name="positions">Спеціальність:</string>
+    <string name="days_report">дня(-ень)</string>
+    <string name="comment_manager_report">Коментар менеджера</string>
+    <string name="comment_performer_report">Коментар виконавця</string>
+    <string name="stitched_repport">прострочено</string>
+    <string name="general_type">Загальний тип</string>
+    <string name="relative_type">Відносний тип</string>
+    <string name="description">Опис</string>
 </resources>
 
 

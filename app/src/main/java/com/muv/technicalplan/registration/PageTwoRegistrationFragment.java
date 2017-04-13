@@ -35,7 +35,6 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
     private static final int LAYOUT = R.layout.registration_page_two;
     private JsonParser jsonParser = new JsonParser();
     private ConstantUrl url = new ConstantUrl();
-    private TabPagerFragmentAdapterRegistration fragmentTabPager;
     private Internet internet = new Internet();
 
     private EditText email;
@@ -344,27 +343,24 @@ public class PageTwoRegistrationFragment extends AbstractTabFragment
             }
             else
             {
-                if (fragmentTabPager != null)
+                BaseUser baseUser = new BaseUser();
+                baseUser.createBase(dataUser);
+                registered = true;
+
+                if (path != null)
                 {
-                    BaseUser baseUser = new BaseUser();
-                    baseUser.createBase(dataUser);
-                    registered = true;
-
-                    Intent intent = new Intent(UPDATE);
-                    intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
-                    intent.putExtra("Update", "account");
-                    intent.putExtra("change", "false");
-                    intent.putExtra("registration", "true");
-                    getActivity().sendBroadcast(intent);
-
-                    if (path != null)
-                    {
-                        ConstantUrl url = new ConstantUrl();
-                        UploadMultipart uploadMultipart = new UploadMultipart();
-                        uploadMultipart.uploadImage(context, path, url.getUrlUploadImage(dataUser.getLogin(), dataUser.getLogin()));
-                    }
-                    activity.onPressedBack();
+                    ConstantUrl url = new ConstantUrl();
+                    UploadMultipart uploadMultipart = new UploadMultipart();
+                    uploadMultipart.uploadImage(context, path, url.getUrlUploadImage(dataUser.getLogin(), dataUser.getLogin()));
                 }
+                activity.onPressedBack();
+
+                Intent intent = new Intent(UPDATE);
+                intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+                intent.putExtra("Update", "account");
+                intent.putExtra("change", "false");
+                intent.putExtra("registration", "true");
+                getActivity().sendBroadcast(intent);
             }
         }
     }

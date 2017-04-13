@@ -134,4 +134,52 @@ public class UploadMultipart extends Activity
             e.printStackTrace();
         }
     }
+
+    public void uploadTemplate(final Context context, String  path, String url, final EnterpriseActivity activity)
+    {
+        try
+        {
+            UploadNotificationConfig uploadNotificationConfig = new UploadNotificationConfig();
+            uploadNotificationConfig.setTitle(context.getText(R.string.upload_template).toString());
+            uploadNotificationConfig.setInProgressMessage(context.getText(R.string.uploadind).toString() + " " + Placeholders.PROGRESS);
+            uploadNotificationConfig.setCompletedMessage(context.getText(R.string.comleted_template).toString());
+            uploadNotificationConfig.setErrorMessage(context.getText(R.string.error).toString());
+            uploadNotificationConfig.setRingToneEnabled(false);
+
+            String uploadId = UUID.randomUUID().toString();
+            MultipartUploadRequest uploadRequest = new MultipartUploadRequest(context, uploadId, url);
+
+            uploadRequest.addFileToUpload(path, "text");
+            uploadRequest.setMaxRetries(2);
+            uploadRequest.setNotificationConfig(uploadNotificationConfig);
+            uploadRequest.setDelegate(new UploadStatusDelegate() {
+                @Override
+                public void onProgress(UploadInfo uploadInfo) {
+
+                }
+
+                @Override
+                public void onError(UploadInfo uploadInfo, Exception exception)
+                {
+                    activity.getFragmentReport().dialogDismiss();
+                }
+
+                @Override
+                public void onCompleted(UploadInfo uploadInfo, ServerResponse serverResponse)
+                {
+                    activity.getFragmentReport().getDataMapsUpload();
+                }
+
+                @Override
+                public void onCancelled(UploadInfo uploadInfo) {
+
+                }
+            });
+            uploadRequest.startUpload();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 }

@@ -20,6 +20,10 @@ public class DataMaps extends SugarRecord
     private String name_table;
     private String state_performance;
     private String stitched;
+    private String login;
+    private String name;
+    private String surname;
+    private String surname_father;
     private int expand_height;
 
     public DataMaps() {
@@ -27,7 +31,8 @@ public class DataMaps extends SugarRecord
 
     public DataMaps(int id, String code, String general, String relative, String description, String normal,
                     String lightweight, String light, String date, String comment_manager, String comment_performer, String position,
-                    String name_table, String state_performance, String stitched)
+                    String name_table, String state_performance, String stitched, String login, String name,
+                    String surname, String surname_father)
     {
         this.idMap = id;
         this.code = code;
@@ -44,6 +49,42 @@ public class DataMaps extends SugarRecord
         this.name_table = name_table;
         this.state_performance = state_performance;
         this.stitched = stitched;
+        this.login = login;
+        this.name = name;
+        this.surname = surname;
+        this.surname_father = surname_father;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public String getSurname_father() {
+        return surname_father;
+    }
+
+    public void setSurname_father(String surname_father) {
+        this.surname_father = surname_father;
     }
 
     public int getIdMap() {

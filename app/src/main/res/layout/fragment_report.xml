@@ -1,7 +1,389 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/mainBackground">
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mainBackground"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/colorWhite"
+            android:padding="15dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:text="@string/overall"
+                    android:textColor="@color/Grey"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/report_head"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:textColor="@color/Grey"
+                        android:background="@drawable/edit_text_registration"
+                        android:layout_marginBottom="6dp"
+                        android:textColorHint="@color/GreyHint"
+                        android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                        android:gravity="center"
+                        android:textCursorDrawable="@drawable/color_cursor_all"
+                        android:textColorHighlight="@color/colorPrimary"
+                        android:hint="@string/head"
+                        android:textSize="8pt"
+                        android:typeface="normal"
+                        android:padding="5dp"/>
+
+                    <EditText
+                        android:id="@+id/report_name_doc"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:textColor="@color/Grey"
+                        android:background="@drawable/edit_text_registration"
+                        android:textColorHint="@color/GreyHint"
+                        android:inputType="textNoSuggestions|text|textVisiblePassword|textCapWords"
+                        android:gravity="center"
+                        android:textCursorDrawable="@drawable/color_cursor_all"
+                        android:textColorHighlight="@color/colorPrimary"
+                        android:hint="@string/name_doc"
+                        android:textSize="8pt"
+                        android:typeface="normal"
+                        android:padding="5dp"
+                        android:layout_marginBottom="6dp"/>
+
+                    <Button
+                        android:id="@+id/report_template"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:textColor="@color/colorWhite"
+                        android:background="@drawable/button_all"
+                        android:text="@string/my_template"
+                        android:textAllCaps="false"
+                        android:textSize="8pt"
+                        android:typeface="normal" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="15dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:text="@string/period"
+                    android:textColor="@color/Grey"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="15dp"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="8pt"
+                        android:text="@string/with"
+                        android:textColor="@color/Grey"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/report_with"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="8pt"
+                        android:textColor="@color/Grey"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@drawable/edit_text_registration"
+                        android:padding="11dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="8pt"
+                        android:text="@string/by"
+                        android:textColor="@color/Grey"
+                        android:gravity="center_vertical"/>
+
+                    <TextView
+                        android:id="@+id/report_by"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="8pt"
+                        android:textColor="@color/Grey"
+                        android:layout_marginLeft="10dp"
+                        android:background="@drawable/edit_text_registration"
+                        android:padding="11dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_marginTop="15dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:text="@string/regime"
+                    android:textColor="@color/Grey"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="5dp">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_regime_all"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/all"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_regime_normal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/normal_regime"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_regime_lightweight"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/lightweight_regime"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_regime_light"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/light_regime"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:layout_marginTop="11dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:textColor="@color/Grey"
+                    android:text="@string/specialty"
+                    android:gravity="center" />
+
+                <RelativeLayout
+                    android:id="@+id/progress_position_enterprise"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:orientation="vertical">
+
+                    <ProgressBar
+                        android:theme="@style/LinearProgressBlue"
+                        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="20dp"
+                        android:indeterminate="true"
+                        android:layout_centerInParent="true"/>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:id="@+id/fragment_container_enterprise"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/position_hint_enterprise"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:textSize="8pt"
+                    android:textColor="@color/GreyHint"
+                    android:text="@string/not_position_enterprise"
+                    android:gravity="center"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:text="@string/comments"
+                    android:textColor="@color/Grey"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="5dp">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_position_without"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/without"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_position_all"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/all"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_position_manager"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/managers"/>
+
+                    <CheckBox
+                        android:id="@+id/checkbox_position_performer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/performers"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="8pt"
+                    android:text="@string/other"
+                    android:textColor="@color/Grey"
+                    android:layout_gravity="center" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="5dp">
+
+                    <CheckBox
+                        android:id="@+id/checkbox_who_made"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/Grey"
+                        android:textSize="8pt"
+                        android:text="@string/who_made"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/save_report"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textColor="@color/colorWhite"
+                android:background="@drawable/button_all"
+                android:text="@string/save_report"
+                android:textAllCaps="false"
+                android:textSize="8pt"
+                android:typeface="normal"
+                android:layout_marginTop="15dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_report"
+                android:textColor="@color/Grey"
+                android:gravity="center"
+                android:textSize="6pt"
+                android:layout_marginBottom="15dp"/>
+
+            <Button
+                android:id="@+id/report_sample_template"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:textColor="@color/colorWhite"
+                android:background="@drawable/button_all"
+                android:text="@string/load_template_map"
+                android:textAllCaps="false"
+                android:textSize="8pt"
+                android:typeface="normal" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

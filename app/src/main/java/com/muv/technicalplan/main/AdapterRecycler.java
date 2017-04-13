@@ -225,7 +225,7 @@ public class AdapterRecycler  extends RecyclerView.Adapter<AdapterRecycler.ViewH
                                     monthReal = "0" + month;
                                 }
                                 String daysReal = days + "";
-                                if (monthReal.length() == 1)
+                                if (daysReal.length() == 1)
                                 {
                                     daysReal = "0" + days;
                                 }
@@ -234,7 +234,7 @@ public class AdapterRecycler  extends RecyclerView.Adapter<AdapterRecycler.ViewH
                                 stitched = stitched.replace("[false]", "");
                                 stitched = stitched.replace("[true]", "");
                                 String url = constantUrl.getUrlCompletedStitched(dataMap.get(holder.getAdapterPosition()).getName_table(),
-                                        dateNew, stitched, dataMap.get(position).getIdMap() + "");
+                                        dateNew, stitched, dataMap.get(position).getIdMap() + "", user.get(0).getLogin());
                                 Completed completed = new Completed(url, position, dateNew, dataMap.get(position).getDescription(),
                                         dataMap.get(position).getPosition());
                                 completed.execute();

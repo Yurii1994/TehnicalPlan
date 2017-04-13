@@ -56,6 +56,20 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
     private String TAG;
     private String positionOld;
     private String name_table;
+    private String TAG_Upload_Download;
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putString("Position", position.getText().toString());
+        outState.putString("PositionOld", positionOld);
+        outState.putString("Path", path);
+        outState.putString("Code", code);
+        outState.putString("Tag", TAG);
+        outState.putString("Name_table", name_table);
+        outState.putString("TAG_Upload_Download", TAG_Upload_Download);
+    }
 
     public String getPositionOld() {
         return positionOld;
@@ -135,6 +149,17 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         delete.setOnClickListener(this);
         upload.setOnClickListener(this);
         getChangeKeyboard();
+
+        if (savedInstanceState != null)
+        {
+            position.setText(savedInstanceState.getString("Position"));
+            positionOld = savedInstanceState.getString("PositionOld");
+            path = savedInstanceState.getString("Path");
+            code = savedInstanceState.getString("Code");
+            TAG = savedInstanceState.getString("Tag");
+            name_table = savedInstanceState.getString("Name_table");
+            TAG_Upload_Download = savedInstanceState.getString("TAG_Upload_Download");
+        }
         return view;
     }
 
@@ -228,8 +253,6 @@ public class FragmentPositionMap extends Fragment implements View.OnClickListene
         fragmentSettings.getEnterpriseActivity().setUpdate(false);
         fragmentSettings.setDataMapsDelete(dataMap);
     }
-
-    private String TAG_Upload_Download;
 
     private void UploadDownloadCSVFile(String TAG_Upload_Download, boolean comment)
     {

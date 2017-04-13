@@ -24,6 +24,7 @@ import com.muv.technicalplan.UploadMultipart;
 import com.muv.technicalplan.data.DataMap;
 import com.muv.technicalplan.data.DataPosition;
 import com.muv.technicalplan.data.DataUser;
+import com.muv.technicalplan.linking.FragmentLinking;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class EnterpriseActivity extends AppCompatActivity
     private BroadcastReceiver broadcastReceiver;
     private List<FragmentPositionMap> fragmentPositionMaps;
     private Toast toast;
+    private boolean update_main = false;
 
     public void setUpdate(boolean update) {
         this.update = update;
@@ -88,6 +90,10 @@ public class EnterpriseActivity extends AppCompatActivity
         initToolbar();
         initTabs();
         dialog = new DialogFragmentProgress().newInstance(getResources().getString(R.string.save));
+        if (savedInstanceState != null)
+        {
+            invalidateOptionsMenu();
+        }
     }
 
     private void initToolbar()
@@ -112,6 +118,20 @@ public class EnterpriseActivity extends AppCompatActivity
                         case R.id.menu_enterprise_save:
                             Save();
                             break;
+
+                        case R.id.menu_refresh_enterprise:
+                            if (viewPager.getCurrentItem() == 0)
+                            {
+                                FragmentReport fragmentReport = getFragmentReport();
+                                fragmentReport.update(fragmentReport.getProgress(),
+                                        fragmentReport.getFragment_container(), fragmentReport.getHint());
+                            }
+                            else
+                            {
+                                FragmentSettings fragmentSettings = getFragmentSettings();
+                                fragmentSettings.updateFragment(fragmentSettings.getProgress(), fragmentSettings.getHintView());
+                            }
+                            break;
                     }
                     return true;
                 }
@@ -119,35 +139,72 @@ public class EnterpriseActivity extends AppCompatActivity
         }
     }
 
+    public FragmentReport getFragmentReport()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        FragmentReport fragmentReport = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                fragmentReport = (FragmentReport) fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return fragmentReport;
+    }
+
+    public FragmentSettings getFragmentSettings()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        FragmentSettings fragmentSettings = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                fragmentSettings = (FragmentSettings) fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return fragmentSettings;
+    }
+
     @Override
     protected void onResume()
     {
         super.onResume();
-        IntentFilter filter = new IntentFilter(UPDATE);
-        broadcastReceiver = new BroadcastReceiver()
+        if (!update_main)
         {
-            @Override
-            public void onReceive(Context context, Intent intent)
+            IntentFilter filter = new IntentFilter(UPDATE);
+            broadcastReceiver = new BroadcastReceiver()
             {
-                String update = intent.getStringExtra("Update");
-                if (update.equals("position"))
+                @Override
+                public void onReceive(Context context, Intent intent)
                 {
-                    UpdatePositionInFragment updatePositionInFragment = new UpdatePositionInFragment(fragmentPositionMaps);
-                    updatePositionInFragment.execute();
+                    String update = intent.getStringExtra("Update");
+                    if (update.equals("position"))
+                    {
+                        UpdatePositionInFragment updatePositionInFragment = new UpdatePositionInFragment(fragmentPositionMaps);
+                        updatePositionInFragment.execute();
+                    }
+                    else
+                    if (update.equals("show_dialog"))
+                    {
+                        dialogShow();
+                    }
+                    else
+                    if (update.equals("dismiss_dialog"))
+                    {
+                        dialogDismiss();
+                    }
                 }
-                else
-                if (update.equals("show_dialog"))
-                {
-                    dialogShow();
-                }
-                else
-                if (update.equals("dismiss_dialog"))
-                {
-                    dialogDismiss();
-                }
-            }
-        };
-        registerReceiver(broadcastReceiver, filter);
+            };
+            registerReceiver(broadcastReceiver, filter);
+        }
     }
 
     @Override
@@ -209,12 +266,13 @@ public class EnterpriseActivity extends AppCompatActivity
 
     private void Save()
     {
-        List<Fragment> fragments =  adapter.getFragmentSettings().getRealFragments();
+        List<Fragment> fragments =  getFragmentSettings().getRealFragments(getSupportFragmentManager());
         fragmentPositionMaps = getFragmentPosition(fragments);
         List<FragmentPositionMap> fragmentPositionMapsForUpdate = getMapFragmentForUpdate(fragmentPositionMaps);
         ConstantUrl constantUrl = new ConstantUrl();
         List<DataMap> dataMaps = getDataMap(fragmentPositionMapsForUpdate);
         List<DataUser> user = DataUser.listAll(DataUser.class);
+        boolean change = false;
         if (dataMaps.size() > 0)
         {
             for (int i = 0; i < dataMaps.size(); i++)
@@ -225,6 +283,7 @@ public class EnterpriseActivity extends AppCompatActivity
                     {
                         if (!dataMaps.get(i).getEnterprise().equals(""))
                         {
+                            change = true;
                             String url = constantUrl.setUrlPositionMap(user.get(0).getLogin(),
                                     dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition());
                             UploadMultipart uploadMultipart = new UploadMultipart();
@@ -243,6 +302,7 @@ public class EnterpriseActivity extends AppCompatActivity
                         {
                             if (!dataMaps.get(i).getEnterprise().equals(""))
                             {
+                                change = true;
                                 String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
                                         dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(),
                                         dataMaps.get(i).getCode(), dataMaps.get(i).getName_table(), true);
@@ -261,6 +321,7 @@ public class EnterpriseActivity extends AppCompatActivity
                         {
                             if (!dataMaps.get(i).getEnterprise().equals(""))
                             {
+                                change = true;
                                 String url = constantUrl.setUrlPositionMapRefresh(user.get(0).getLogin(),
                                         dataMaps.get(i).getEnterprise(), dataMaps.get(i).getPosition(),
                                         dataMaps.get(i).getCode(), dataMaps.get(i).getName_table(), false);
@@ -284,12 +345,12 @@ public class EnterpriseActivity extends AppCompatActivity
         {
             try
             {
-                if (!adapter.getFragmentSettings().getEnterprise().equals(""))
+                if (!getFragmentSettings().getEnterprise().equals(""))
                 {
-                    if (!user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise()))
+                    if (!user.get(0).getEnterprise().equals(getFragmentSettings().getEnterprise()))
                     {
                         UpdateEnterprise updateEnterprise = new UpdateEnterprise(constantUrl.getUrlUpdateEnterprise(
-                                user.get(0).getLogin(), adapter.getFragmentSettings().getEnterprise()));
+                                user.get(0).getLogin(), getFragmentSettings().getEnterprise()));
                         updateEnterprise.execute();
                     }
                 }
@@ -301,25 +362,38 @@ public class EnterpriseActivity extends AppCompatActivity
             catch (Exception e)
             {}
         }
-        List<DataMap> dataMapsDelete = adapter.getFragmentSettings().getDataMapsDelete();
+        List<DataMap> dataMapsDelete = getFragmentSettings().getDataMapsDelete();
         adapter.notifyDataSetChanged();
         if (dataMapsDelete.size() > 0)
         {
+            change = true;
             Delete delete = new Delete(dataMapsDelete);
             delete.execute();
         }
+        if (change)
+        {
+            update_main = true;
+            Intent intent = new Intent(UPDATE);
+            intent.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
+            intent.putExtra("Update", "account");
+            intent.putExtra("Full_update", "true");
+            intent.putExtra("change", "true");
+            sendBroadcast(intent);
+        }
     }
+
+
 
     private void getMassageSaveChange()
     {
-        int count = adapter.getFragmentSettings().getCount_created();
-        List<Fragment> fragments =  adapter.getFragmentSettings().getRealFragments();
+        int count = getFragmentSettings().getCount_created();
+        List<Fragment> fragments =  getFragmentSettings().getRealFragments(getSupportFragmentManager());
         List<FragmentPositionMap> fragmentPositionMaps = getFragmentPosition(fragments);
         List<DataMap> dataMaps = getDataMap(fragmentPositionMaps);
         List<DataUser> user = DataUser.listAll(DataUser.class);
-        if (user.get(0).getEnterprise() != null & !adapter.getFragmentSettings().getEnterprise().equals(""))
+        if (user.get(0).getEnterprise() != null & !getFragmentSettings().getEnterprise().equals(""))
         {
-            if (dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
+            if (dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(getFragmentSettings().getEnterprise())
                     || count != fragmentPositionMaps.size())
             {
                 showToastMessage(getResources().getText(R.string.not_save).toString());
@@ -362,7 +436,7 @@ public class EnterpriseActivity extends AppCompatActivity
         {
             super.onPostExecute(result);
             MassageSaved();
-            adapter.getFragmentSettings().setDataMapsDelete(new ArrayList<DataMap>());
+            getFragmentSettings().setDataMapsDelete(new ArrayList<DataMap>());
             dialogDismiss();
         }
     }
@@ -454,7 +528,7 @@ public class EnterpriseActivity extends AppCompatActivity
                 if (!fragments.get(i).getPath().equals("") || !fragments.get(i).getPositionOld().equals(fragments.get(i).getPosition()))
                 {
                     DataMap dataMap = new DataMap();
-                    dataMap.setEnterprise(adapter.getFragmentSettings().getEnterprise());
+                    dataMap.setEnterprise(getFragmentSettings().getEnterprise());
                     dataMap.setPosition(fragments.get(i).getPosition());
                     dataMap.setPath(fragments.get(i).getPath());
                     dataMap.setTAG(fragments.get(i).getTAG());
@@ -504,21 +578,15 @@ public class EnterpriseActivity extends AppCompatActivity
     {
         getMenuInflater().inflate(R.menu.menu_enterprise, menu);
         save = menu.findItem(R.id.menu_enterprise_save);
-        save.setVisible(false);
-        return true;
-    }
 
-    private void initTabs()
-    {
-        viewPager = (ViewPager)findViewById(R.id.view_pager_enterprise);
-        adapter = new TabsPagerFragmentAdapterEnterprise(this, getSupportFragmentManager(), this);
-
-        viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(adapter);
-
-        tabLayout = (TabLayout)findViewById(R.id.tab_enterprise);
-        tabLayout.setupWithViewPager(viewPager);
-
+        if (viewPager.getCurrentItem() == 0)
+        {
+            save.setVisible(false);
+        }
+        else
+        {
+            save.setVisible(true);
+        }
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -547,6 +615,19 @@ public class EnterpriseActivity extends AppCompatActivity
 
             }
         });
+        return true;
+    }
+
+    private void initTabs()
+    {
+        viewPager = (ViewPager)findViewById(R.id.view_pager_enterprise);
+        adapter = new TabsPagerFragmentAdapterEnterprise(this, getSupportFragmentManager());
+
+        viewPager.setOffscreenPageLimit(2);
+        viewPager.setAdapter(adapter);
+
+        tabLayout = (TabLayout)findViewById(R.id.tab_enterprise);
+        tabLayout.setupWithViewPager(viewPager);
     }
 
     @Override
@@ -568,14 +649,14 @@ public class EnterpriseActivity extends AppCompatActivity
         {
             super.onBackPressed();
         }
-        int count = adapter.getFragmentSettings().getCount_created();
-        List<Fragment> fragments =  adapter.getFragmentSettings().getRealFragments();
+        int count = getFragmentSettings().getCount_created();
+        List<Fragment> fragments =  getFragmentSettings().getRealFragments(getSupportFragmentManager());
         List<FragmentPositionMap> fragmentPositionMaps = getFragmentPosition(fragments);
         List<DataMap> dataMaps = getDataMap(fragmentPositionMaps);
         List<DataUser> user = DataUser.listAll(DataUser.class);
-        if (user.get(0).getEnterprise() != null & !adapter.getFragmentSettings().getEnterprise().equals(""))
+        if (user.get(0).getEnterprise() != null & !getFragmentSettings().getEnterprise().equals(""))
         {
-            if ((dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(adapter.getFragmentSettings().getEnterprise())
+            if ((dataMaps.size() > 0 || !user.get(0).getEnterprise().equals(getFragmentSettings().getEnterprise())
                     || count != fragmentPositionMaps.size()) & !update )
             {
                 showToastMessage(getResources().getText(R.string.not_save).toString());

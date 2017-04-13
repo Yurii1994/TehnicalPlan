@@ -1,6 +1,8 @@
 package com.muv.technicalplan;
 
 
+import com.muv.technicalplan.enterprise.EnterpriseActivity;
+
 import java.net.URLEncoder;
 
 public class ConstantUrl
@@ -208,9 +210,10 @@ public class ConstantUrl
         return stringBuilder.toString();
     }
 
-    public String getUrlCompletedStitched(String name_table, String date, String stitched, String id)
+    public String getUrlCompletedStitched(String name_table, String date, String stitched, String id, String login)
     {
-        return url_php_position + action_insert_stitched + this.name_table + name_table + this.date + date + this.stitched + stitched + this.id + id;
+        return url_php_position + action_insert_stitched + this.name_table + name_table + this.date + date + this.stitched
+                + stitched + this.id + id + this.login + login;
     }
 
     public String getUrlComment (String name_table, String comment_manager, String comment_performer, String id)
@@ -310,5 +313,60 @@ public class ConstantUrl
         stringBuilder.append(this.comment_state);
         stringBuilder.append(comment_state);
         return stringBuilder.toString();
+    }
+
+    private String url_report = "http://www.technicalplan.ho.ua/word/generator.php?";
+    private String url_template = "http://www.technicalplan.ho.ua/word/upload.php?";
+    private String textReport = "&text_report=";
+    private String textDescription = "&text_description=";
+    private String head = "&head=";
+    private String manager = "&manager=";
+    private String name_file = "&name_file=";
+    private String action_create = "&action=create";
+    private String action_delete = "&action=delete";
+    private String action_upload = "&action=upload";
+    private String path = "&path=";
+    private String id_template = "&id_template=";
+
+    private String DOWNLOAN_SAMPLE_REPORT_URL = "http://technicalplan.ho.ua/word/word_template/";
+    private String DOWNLOAN_REPORT_URL = "http://technicalplan.ho.ua/word/";
+
+    public String getDeleteReport(String name_file)
+    {
+        return url_report + action_delete + this.name_file + name_file;
+    }
+
+    public String getUrlDownloadSampleReport(String name) throws Exception
+    {
+        StringBuilder stringBuilder = new StringBuilder(DOWNLOAN_SAMPLE_REPORT_URL);
+        stringBuilder.append(URLEncoder.encode(name, "UTF-8"));
+        return stringBuilder.toString();
+    }
+
+    public String getUrlDownloadReport(String name) throws Exception
+    {
+        StringBuilder stringBuilder = new StringBuilder(DOWNLOAN_REPORT_URL);
+        stringBuilder.append(URLEncoder.encode(name, "UTF-8"));
+        return stringBuilder.toString();
+    }
+
+    public String getUrlUploadSampleReport(String id_template)
+    {
+        return url_template + action_upload + this.id_template + id_template;
+    }
+
+    public String getUrlReport()
+    {
+        return url_report;
+    }
+
+    public String getUrlReportParameter(String textReport, String textDescription, String enterprise,
+                                        String head, String manager, String position, String name_file, String path) throws Exception
+    {
+        return  action_create + this.textReport + URLEncoder.encode(textReport, "UTF-8") + this.textDescription +
+                URLEncoder.encode(textDescription, "UTF-8") + this.enterprise + URLEncoder.encode(enterprise, "UTF-8") +
+                this.head + URLEncoder.encode(head, "UTF-8") + this.manager + URLEncoder.encode(manager, "UTF-8") +
+                this.position + URLEncoder.encode(position, "UTF-8") + this.name_file + URLEncoder.encode(name_file, "UTF-8")
+                + this.path + URLEncoder.encode(path, "UTF-8");
     }
 }

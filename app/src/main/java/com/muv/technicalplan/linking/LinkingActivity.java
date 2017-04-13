@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -40,8 +41,15 @@ public class LinkingActivity extends AppCompatActivity
     private MenuItem searchItem;
     private MenuItem refresh;
     private MainActivity mainActivity;
+    public TabsPagerFragmentAdapterLinking adapter;
+    private boolean stateLinking;
 
-    private TabsPagerFragmentAdapterLinking adapter;
+    @Override
+    public void onSaveInstanceState(final Bundle outState)
+    {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("StateLinking", getStateLinking());
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -50,40 +58,13 @@ public class LinkingActivity extends AppCompatActivity
         setContentView(LAYOUT);
         initToolbar();
         initTabs();
+
+        if (savedInstanceState != null)
+        {
+            invalidateOptionsMenu();
+            stateLinking = savedInstanceState.getBoolean("StateLinking");
+        }
         mainActivity = MainActivity.getMainActivity();
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position)
-            {
-                if (position == 0)
-                {
-                    if (adapter.getStateLinking())
-                    {
-                        adapter.setStateLinking(false);
-                        adapter.createActivityLinking();
-                    }
-                    adapter.setDataSearches(new ArrayList<DataSearch>());
-                    refresh.setVisible(true);
-                    searchItem.setVisible(false);
-                    getCloseSearch();
-                }
-                else
-                {
-                    searchItem.setVisible(true);
-                    refresh.setVisible(false);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
 
@@ -141,8 +122,8 @@ public class LinkingActivity extends AppCompatActivity
             @Override
             public boolean onQueryTextSubmit(String query)
             {
-                adapter.setDataSearches(new ArrayList<DataSearch>());
-                adapter.getSearch(query);
+                setDataSearches(new ArrayList<DataSearch>());
+                getSearch(query);
                 return false;
             }
             @Override
@@ -150,15 +131,62 @@ public class LinkingActivity extends AppCompatActivity
                 return false;
             }
         });
-        searchItem.setVisible(false);
+
         getMenuInflater().inflate(R.menu.menu_linking, menu);
         refresh = menu.findItem(R.id.menu_refresh_linking);
+        if (viewPager.getCurrentItem() == 0)
+        {
+            searchItem.setVisible(false);
+            refresh.setVisible(true);
+        }
+        else
+        {
+            searchItem.setVisible(true);
+            refresh.setVisible(false);
+        }
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position)
+            {
+                if (position == 0)
+                {
+                    if (getStateLinking() || stateLinking)
+                    {
+                        setStateLinking(false);
+                        createActivityLinking(true);
+                        stateLinking = false;
+                    }
+                    setDataSearches(new ArrayList<DataSearch>());
+                    refresh.setVisible(true);
+                    searchItem.setVisible(false);
+                    getCloseSearch();
+                }
+                else
+                {
+                    searchItem.setVisible(true);
+                    refresh.setVisible(false);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         return true;
     }
 
     public void searchViewClearFocus()
     {
-        searchView.clearFocus();
+        if (searchView != null)
+        {
+            searchView.clearFocus();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -209,7 +237,7 @@ public class LinkingActivity extends AppCompatActivity
                     switch (item.getItemId())
                     {
                         case R.id.menu_refresh_linking:
-                            adapter.createActivityLinking();
+                            createActivityLinking(true);
                             break;
                     }
                     return true;
@@ -218,10 +246,69 @@ public class LinkingActivity extends AppCompatActivity
         }
     }
 
+    public FragmentSearch getFragmentSearch()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        FragmentSearch fragmentSearch = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                fragmentSearch = (FragmentSearch) fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return fragmentSearch;
+    }
+
+    public FragmentLinking getFragmentLinking()
+    {
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        FragmentLinking fragmentLinking = null;
+        for (int i = 0; i < fragments.size(); i++)
+        {
+            try
+            {
+                fragmentLinking = (FragmentLinking) fragments.get(i);
+                break;
+            }
+            catch (Exception e)
+            {}
+        }
+        return fragmentLinking;
+    }
+
+    public void getSearch(String query)
+    {
+        getFragmentSearch().getSearch(query);
+    }
+
+    public void createActivityLinking(boolean update)
+    {
+        getFragmentLinking().createActivity(update);
+    }
+
+    public boolean getStateLinking()
+    {
+        return getFragmentSearch().getStateLinking();
+    }
+
+    public void setStateLinking(boolean state)
+    {
+        getFragmentSearch().setStateLinking(state);
+    }
+
+    public void setDataSearches(List<DataSearch> list)
+    {
+        getFragmentSearch().setDataSearches(list);
+    }
+
     private void initTabs()
     {
         viewPager = (ViewPager)findViewById(R.id.view_pager_linking);
-        adapter = new TabsPagerFragmentAdapterLinking(this, getSupportFragmentManager(), this);
+        adapter = new TabsPagerFragmentAdapterLinking(this, getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(2);
         viewPager.setAdapter(adapter);
 
